@@ -30,7 +30,7 @@ MATS = {
     CLIMB: (10, 9, 9, 0x02),
     SIGN: (11, 11, 3, 0x03),
     WOOD: (4, 4, 2, 0),
-    GLASS: (10, 10, 10, 0x76),  # light strips
+    GLASS: (10, 10, 10, 0x75),  # light strips
     DARK: (5, 0, 0, 0),       # track bed, columns
     ACCENT: (6, 9, 9, 0xa1),  # train, lit windows
 }

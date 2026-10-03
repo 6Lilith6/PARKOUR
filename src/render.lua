@@ -2,7 +2,7 @@
 -- of boxes, near-plane clipping,
 -- scanline polygons, fog, sky
 
-near=.2
+near,fr=.2,0
 
 -- convex polygon fill: downward
 -- edges fill one side, upward
@@ -40,6 +40,16 @@ function cpoly(vs,c)
  if #o>2 then poly(o,c) end
 end
 
+-- insertion sort, largest key
+-- first
+function isort(t,k)
+ for i=2,#t do
+  local p,j=t[i],i-1
+  while j>0 and t[j][k]<p[k] do t[j+1]=t[j] j-=1 end
+  t[j+1]=p
+ end
+end
+
 function lerp3(a,b,t)
  return {a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,a[3]+(b[3]-a[3])*t}
 end
@@ -50,10 +60,16 @@ function fp(q,u,t)
  return lerp3(lerp3(q[1],q[4],u),lerp3(q[2],q[3],u),t)
 end
 
+-- sub-quad u0..u1 x t0..t1
+function fq(q,u,t,v,w)
+ return {fp(q,u,t),fp(q,u,w),fp(q,v,w),fp(q,v,t)}
+end
+
 -- corner order per axis so that
 -- 1-2 and 4-3 are vertical edges
-faces={split"0,2,6,4",split"0,1,5,4",split"0,2,3,1"}
-ubx=split"-999,-999,999,999"
+faces={split"1,3,7,5",split"1,2,6,5",split"1,3,4,2"}
+-- box corner i: x/y/z index
+ci,cj,ck=split"1,4,1,4,1,4,1,4",split"2,2,5,5,2,2,5,5",split"3,3,3,3,6,6,6,6"
 fpat={0x3333,0x5555,0x7777,0x5a5a}
 dpat=split"0,0xf0f0,0,0x3333,0,0,0,0xa5a5"
 
@@ -93,8 +109,8 @@ function render()
  -- get camera-space corners and
  -- screen bounds
  local v={}
- for b in all(dl) do
-  local d,e,f,bx=0,0,0
+ for k=1,#dl do
+  local b,d,e,f=dl[k],0,0,0
   for i=1,3 do
    local c,m=cpos[i],(b[i]+b[i+3])/2
    d+=abs(m-c)
@@ -103,23 +119,39 @@ function render()
   end
   b.d,b.e=d,e
   if e<sk[8]+24 and f>near then
-   bx,b.cs=split"999,999,-999,-999",{}
-   b.bx=bx
-   for i=0,7 do
-    local c={tocam(b[1+i%2*3],b[2+flr(i/2)%2*3],b[3+flr(i/4)*3])}
-    b.cs[i]=c
-    -- corner behind us: unbounded
-    local s=c[3]>near and proj(c) or ubx
-    bx[1],bx[2],bx[3],bx[4]=min(bx[1],s[1]),min(bx[2],s[2]),max(bx[3],s[3] or s[1]),max(bx[4],s[4] or s[2])
+   local x0,y0,x1,y1,cs=999,999,-999,-999,{}
+   for i=1,8 do
+    local c={tocam(b[ci[i]],b[cj[i]],b[ck[i]])}
+    cs[i]=c
+    if c[3]<near then
+     -- corner behind us: unbounded
+     x0,y0,x1,y1=-999,-999,999,999
+    else
+     local s=proj(c)
+     x0,y0,x1,y1=min(x0,s[1]),min(y0,s[2]),max(x1,s[1]),max(y1,s[2])
+    end
+   end
+   b.cs,b.bx=cs,{x0,y0,x1,y1}
+   -- on screen? far ones are flat
+   -- fog: a rect, no sorting (and
+   -- skipped if they reach behind
+   -- the camera)
+   if x1>=0 and x0<128 and y1>=0 and y0<128 then
+    if e<sk[8]+10 then
+     add(v,b)
+    elseif x0>-999 then
+     rectfill(x0,y0,x1,y1,sk[7])
+    end
    end
   end
-  -- on screen?
-  if e<sk[8]+24 and f>near and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 then add(v,b) end
  end
  -- painter's order: topological
  -- sort over screen-overlapping
- -- pairs (dfs, back to front)
- fr=(fr or 0)+1
+ -- pairs (dfs, back to front),
+ -- starting far to near so most
+ -- boxes behind are already drawn
+ isort(v,"d")
+ fr+=1
  local function visit(b)
   if b.mk~=fr then
    b.mk=fr
@@ -127,7 +159,7 @@ function render()
    for i=1,#v do
     local a=v[i]
     local p=a.bx
-    if p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
+    if a.mk~=fr and p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
    end
    if b==plb then drawplayer() else drawbox(b) end
   end
@@ -139,18 +171,18 @@ end
 
 function drawbox(b)
  local m,cs=mats[b.m],b.cs
- local fog=b.e>sk[8]+14 and 2 or b.e>sk[8] and 1 or 0
+ local fog=b.e>sk[8]
  for ax=1,3 do
   for sd=0,1 do
    if sd==0 and cpos[ax]<b[ax] or sd==1 and cpos[ax]>b[ax+3] then
     local q={}
     for k in all(faces[ax]) do add(q,cs[k+sd*(ax==3 and 4 or ax)]) end
     local c=ax==2 and sd==1 and m[1] or m[ax==1 and 2 or 3]
-    if fog==2 then c=sk[7] elseif fog==1 then fillp(0x5a5a) c+=sk[7]*16 end
+    if fog then fillp(0x5a5a) c+=sk[7]*16 end
     cpoly(q,c)
     fillp()
     -- details only with cpu to spare
-    if ax~=2 and fog==0 and stat(1)<.9 then deco(b,m[5],q,c) end
+    if ax~=2 and not fog and stat(1)<.9 then deco(b,m[5],q,c) end
    end
   end
  end
@@ -159,7 +191,7 @@ end
 -- surface details on vertical
 -- faces. deco: lo=type hi=colour
 -- 1 window bands 3 poster 5 vent
--- 6 neon outline 7 cross brace
+-- 7 cross brace
 -- 2/4/8 full pattern (rungs,
 -- stripes, rough stone/grime)
 function deco(b,dk,q,c)
@@ -167,22 +199,19 @@ function deco(b,dk,q,c)
  if t==1 and h>3 then
   fillp(fpat[flr(b[1]+b[3])%3+1])
   for y=1.4,h-1.2,3 do
-   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+k*16)
+   cpoly(fq(q,.06,y/h,.94,(y+1.3)/h),c+k*16)
   end
  elseif t==3 and h>1.5 then
   fillp(fpat[b.k%4+1])
-  cpoly({fp(q,.08,.15),fp(q,.08,.85),fp(q,.92,.85),fp(q,.92,.15)},({0xa9,0x7c,0xeb,0xb3})[b.k%4+1])
+  cpoly(fq(q,.08,.15,.92,.85),({0xa9,0x7c,0xeb,0xb3})[b.k%4+1])
  elseif t==5 then
   fillp(0x0f0f)
-  cpoly({fp(q,.2,.25),fp(q,.2,.75),fp(q,.8,.75),fp(q,.8,.25)},c+k*16)
- elseif t==6 or t==7 then
-  local s={}
-  for v in all(q) do
-   if v[3]<near then return end
-   add(s,proj(v))
-  end
-  for i=1,t==6 and 4 or 2 do
-   local a,e=s[i],s[t==6 and i%4+1 or i+2]
+  cpoly(fq(q,.2,.25,.8,.75),c+k*16)
+ elseif t==7 then
+  for i=1,2 do
+   local a,e=q[i],q[i+2]
+   if a[3]<near or e[3]<near then return end
+   a,e=proj(a),proj(e)
    line(a[1],a[2],e[1],e[2],k)
   end
  elseif t>0 then

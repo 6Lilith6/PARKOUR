@@ -16,7 +16,7 @@ end
 
 function camupd()
  local h=hs()
- cyaw+=angd(ang-cyaw)*((st=="hang" or st=="climb" or st=="wallup") and .03 or .05+h*.005)
+ cyaw+=angd(ang-cyaw)*(st=="hang" and .03 or .05+h*.005)
  local d,fx,fz=2.6+h*.13,cos(cyaw),sin(cyaw)
  -- above + behind, looking down
  -- at the runner and ahead
@@ -50,8 +50,11 @@ function tocam(x,y,z)
  return z*ccy-x*csy,y*ccp-f*csp,f*ccp+y*csp
 end
 
--- camera space -> screen
+-- camera space -> screen, cached
+-- on the point (shared corners
+-- project once per frame)
 function proj(c)
  local z=c[3]
- return {64+c[1]*fl/z,64-c[2]*fl/z}
+ c.s=c.s or {64+c[1]*fl/z,64-c[2]*fl/z}
+ return c.s
 end

@@ -146,6 +146,15 @@ def lhs_start(toks, i):
 
 def pico_to_lua(src):
     src = src.replace("\\^w", "").replace("\\^t", "")  # p8scii print codes
+    # minified carts glue numbers to names ("1or 0", ".9if"): PICO-8
+    # reads that, Lua 5.4 does not
+    out, pos = [], 0
+    toks = tokenize(src)
+    for a, b in zip(toks, toks[1:]):
+        if a[0] == "num" and b[0] == "name" and a[3] == b[2]:
+            out += [src[pos:b[2]], " "]
+            pos = b[2]
+    src = "".join(out) + src[pos:]
     toks = tokenize(src)
     edits = []  # (start, end, text)
     for i, t in enumerate(toks):
@@ -431,7 +440,12 @@ class Pico:
         self.held = set(hold)
         if count:
             self.L.execute("__icount=0 debug.sethook(__hook,'',100)")
-        self.g._update60()
+        if self.g._update60:
+            self.g._update60()
+        else:                       # one fixed 1/60s step of _update
+            self.g.inp()
+            self.g.menu()
+            self.g.step()
         if count:
             self.L.execute("debug.sethook()")
             upd = self.g['__icount']

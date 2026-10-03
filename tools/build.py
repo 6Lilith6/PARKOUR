@@ -6,6 +6,7 @@
 Each src module becomes its own PICO-8 code tab. The level geometry is
 compiled into map memory (0x2000) so it costs no code tokens.
 """
+import subprocess, sys
 import importlib, os, struct, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -150,8 +151,21 @@ def build(out_path=None):
     out_path = out_path or os.path.join(ROOT, "parkour.p8")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(p8) + "\n")
+    minify(out_path)
     free_left = sum(r[1] - r[0] for r in free)
     return out_path, stats, free_left
+
+
+def minify(path):
+    """Strip comments/whitespace and fold constants with shrinko8 (token
+    focused). Names are kept, so the cart stays debuggable and the sim/tests
+    can read its globals. The readable source is src/*.lua."""
+    tool = os.path.join(os.environ.get("SHRINKO8", "/tmp/shrinko8"), "shrinko8.py")
+    if not os.path.exists(tool):
+        print("  (shrinko8 not found: cart left unminified)")
+        return
+    subprocess.run([sys.executable, tool, path, path, "-m", "-ot", "--no-minify-rename",
+                    "--no-minify-spaces", "--no-minify-lines", "--no-minify-tokens"], check=True)
 
 
 if __name__ == "__main__":

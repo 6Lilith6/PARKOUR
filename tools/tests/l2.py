@@ -15,7 +15,7 @@ SCENARIOS = {
     "wall_f3": ((7.5, 13, 12.2, N), [(60, "up"), (1, "up+z")] + W4, lambda s, tr: tr.get("gy", 0) >= 17),
     "gap_pallets": ((19.5, 17, 27, E), [(300, "up+az")], lambda s, tr: tr.get("gx", 0) > 40),
     "gap_girder": ((17, 17, 30.75, E), [(300, "up+bal")], lambda s, tr: tr.get("gx", 0) > 40),
-    "gap_panel_wallrun": ((4, 17, 26.35, E), [(1, "flow=.8"), (84, "up"), (1, "up+z"), (150, "up+z"), (120, "up")], lambda s, tr: tr.get("gx", 0) > 40 and "wallrun" in tr["pops"]),
+    "gap_panel_wallrun": ((4, 17, 26.35, E), [(1, "flow=.8"), (82, "up"), (1, "up+z"), (150, "up+z"), (120, "up")], lambda s, tr: tr.get("gx", 0) > 40 and "wallrun" in tr["pops"]),
     "t2_ladder": ((44, 17, 14.75, E), [(140, "up")], lambda s, tr: tr.get("gy", 0) >= 21),
     "t2_net": ((40.5, 17, 22, E), [(180, "up")], lambda s, tr: tr.get("gy", 0) >= 21 and "bounce" in tr["pops"]),
     "t2_crates": ((46.5, 21, 14.5, E), [(5, "up"), (150, "up+az")], lambda s, tr: tr.get("gy", 0) >= 25),

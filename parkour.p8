@@ -1,21 +1,18 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
--- parkour: rooftops
--- third-person 3d parkour
--- main loop, game flow,
--- checkpoints, timer, hud
 
-dt=1/60
-lnames=split"old city rooftops,construction site,factory,underground,downtown,neon district,cliff village,megastructure"
-hints=split("⬆️ run   ⬅️➡️ steer   🅾️ jump|run into low obstacles: vault\nfaster run = smoother vault|❎ while running: slide|❎ just before landing: roll\nhigh drops without it hurt|jump at a ledge to grab it\n⬆️ climb  ⬅️➡️ shimmy  ❎ drop\n⬇️+🅾️ jump away|yellow = climbable\nhold ⬆️ to climb|hold 🅾️ into a wall: run up it\nhold 🅾️ along a wall: wallrun|on a wall press 🅾️: kick off\n(tic-tac / wall jump)|narrow beams: ⬅️➡️ keep balance|red awnings bounce you high|keep moving to build flow\nflow = higher top speed|three ways up: ladder,\nsteps, or run up the wall|wallrun, 🅾️ wall jump, wallrun\nor take the cable / skybridge|last climb: stairs, chimney\nor vault-jump-mantle|construction site: climb floor\nby floor to the crane|4m up: ladder, pallets, or\nhold 🅾️ and run up the formwork|❎ slide under the formwork bar\nor go round the lift core|hanging pallet: from still,\n⬆️🅾️ is a short precise hop|gap: hop the pallets, walk\nthe girder or wallrun the panel|safety nets bounce you\na floor up|climb the crane mast and walk\nthe jib to the cab|factory: long straights build\nflow - keep moving, keep speed|the catwalk is the sprint lane:\nladder or crate steps up|container tops: chain the jumps\nwithout stopping|hold 🅾️ along the tank: wallrun\nonto the pipe rack|❎ slide under the pipes,\nvault the valve|slag pit: plank, hook container\nor a full-flow long jump|underground: platform, train\nroof or the track bed|tunnel: wallrun, 🅾️ wall jump,\nwallrun - zig-zag the walls|❎ slide under pipes and cables|7m up: ladder, crate chain\nor run up from a crate|hop the narrow beams over\nthe shaft|downtown: up from the street\nto the rooftops|taxi, van, awning: bounce\nonto the balcony|roof garden: ❎ slide under\nthe pergola, vault the glass|cross on the cable or take\nthe skybridge|office roof: AC units,\npenthouse, tank - pick a line|garage: weave between the\ncars or hop the roofs|4m walls: ladder, gondola,\nAC units, or run up|neon district: speed - keep\nflow up and never stop|wallrun the billboard, hop the\nletters or balance the beam|bounce the bar awning onto\nthe high roof - then fly|the train: wallrun its side\nor run along the roof|leap from the train roof, run\nup the sign, or the ladders|cliff village: careful feet -\nlong falls, slow is fine|bridge, rope, or the roofs:\njump for the far house|up the cliff: ladders, the\nyellow rock, or the outcrops|the gorge: bridge, beams,\nor hop the rock pillars|terraces: ladders, crate and\ngrabs, or run up the walls|last wall: long ladder, or\nrun up the ledges|megastructure: climb it all,\nevery move counts|8m up: ladders, containers,\nor run up the machine twice|the gap: wallrun the panel,\nhop the plates or the pipe|wallrun the core, or the\nplates, or the pipe|bounce pad! then the core\nwallrun, plates or pipe|the crown: last climb, then\nsprint to the end","|")
+
+dt,lnames,hints=.01667,split"old city rooftops,construction site,factory,underground,downtown,neon district,cliff village,megastructure",split("⬆️ run   ⬅️➡️ steer   🅾️ jump|run into low obstacles: vault\nfaster run = smoother vault|❎ while running: slide|❎ just before landing: roll\nhigh drops without it hurt|jump at a ledge to grab it\n⬆️ climb  ⬅️➡️ shimmy  ❎ drop\n⬇️+🅾️ jump away|yellow = climbable\nhold ⬆️ to climb|hold 🅾️ into a wall: run up it\nhold 🅾️ along a wall: wallrun|on a wall press 🅾️: kick off\n(tic-tac / wall jump)|narrow beams: ⬅️➡️ keep balance|red awnings bounce you high|keep moving to build flow\nflow = higher top speed|three ways up: ladder,\nsteps, or run up the wall|wallrun, 🅾️ wall jump, wallrun\nor take the cable / skybridge|last climb: stairs, chimney\nor vault-jump-mantle|construction site: climb floor\nby floor to the crane|4m up: ladder, pallets, or\nhold 🅾️ and run up the formwork|❎ slide under the formwork bar\nor go round the lift core|hanging pallet: from still,\n⬆️🅾️ is a short precise hop|gap: hop the pallets, walk\nthe girder or wallrun the panel|safety nets bounce you\na floor up|climb the crane mast and walk\nthe jib to the cab|factory: long straights build\nflow - keep moving, keep speed|the catwalk is the sprint lane:\nladder or crate steps up|container tops: chain the jumps\nwithout stopping|hold 🅾️ along the tank: wallrun\nonto the pipe rack|❎ slide under the pipes,\nvault the valve|slag pit: plank, hook container\nor a full-flow long jump|underground: platform, train\nroof or the track bed|tunnel: wallrun, 🅾️ wall jump,\nwallrun - zig-zag the walls|❎ slide under pipes and cables|7m up: ladder, crate chain\nor run up from a crate|hop the narrow beams over\nthe shaft|downtown: up from the street\nto the rooftops|taxi, van, awning: bounce\nonto the balcony|roof garden: ❎ slide under\nthe pergola, vault the glass|cross on the cable or take\nthe skybridge|office roof: AC units,\npenthouse, tank - pick a line|garage: weave between the\ncars or hop the roofs|4m walls: ladder, gondola,\nAC units, or run up|neon district: speed - keep\nflow up and never stop|wallrun the billboard, hop the\nletters or balance the beam|bounce the bar awning onto\nthe high roof - then fly|the train: wallrun its side\nor run along the roof|leap from the train roof, run\nup the sign, or the ladders|cliff village: careful feet -\nlong falls, slow is fine|bridge, rope, or the roofs:\njump for the far house|up the cliff: ladders, the\nyellow rock, or the outcrops|the gorge: bridge, beams,\nor hop the rock pillars|terraces: ladders, crate and\ngrabs, or run up the walls|last wall: long ladder, or\nrun up the ledges|megastructure: climb it all,\nevery move counts|8m up: ladders, containers,\nor run up the machine twice|the gap: wallrun the panel,\nhop the plates or the pipe|wallrun the core, or the\nplates, or the pipe|bounce pad! then the core\nwallrun, plates or pipe|the crown: last climb, then\nsprint to the end","|")
 
 function _init()
  cartdata"pk_parkour_2"
  menuitem(1,"restart level",restart)
  menuitem(2,"last checkpoint",respawn)
  menuitem(3,"level select",function() mode="title" end)
- music(0,2000)
+
+ menuitem(4,"perf overlay",function() dbg=not dbg end)
+ music(0)
  mode="title"
  setlv(0)
 end
@@ -25,10 +22,9 @@ function restart()
  respawn()
 end
 
--- reset player at checkpoint
 function respawn()
  px,py,pz,ang=unpack(cp)
- for k in all(split"vx,vy,vz,spd,flow,chain,idle,bal,balv,heavy,ngrab,jbuf,rbuf,coy,kicks,aph,shake,stun,popt,splt,shy,wrs") do _ENV[k]=0 end
+ for k in all(split"vx,vy,vz,spd,flow,chain,idle,bal,balv,heavy,ngrab,jbuf,rbuf,coy,kicks,aph,shake,stun,popt,splt,shy,wrs,lc,lvy,oh") do _ENV[k]=0 end
  peak,pop,fade,bang,crouch,gb,wupd,lastwr=py,"",12,ang
  setst"ground"
  nearupd()
@@ -38,24 +34,33 @@ end
 function inp()
  local o,x=jz,xx
  jz,xx,iu,id=btn(4),btn(5),btn(2),btn(3)
- jzp,xp=jz and not o,xx and not x
- turn=(btn(0) and 1 or 0)-(btn(1) and 1 or 0)
+ jzp,xp,turn=jz and not o,xx and not x,(btn(0)and 1or 0)-(btn(1)and 1or 0)
 end
 
-function _update60()
+function _update()
  inp()
+ menu()
+ step()
+ jzp,xp=nil
+ step()
+end
+
+function menu()
  if mode~="play" then
   if mode=="title" then
-   ang+=.0008
-   -- level select: next level
-   -- unlocks once this one's done
+   ang+=.0016
+
    if btnp(0) then setlv(lv-1) end
    if btnp(1) and dget(lv*8)>0 then setlv(lv+1) end
   elseif jzp then
    setlv(lv+1)
   end
   if jzp or xp and mode=="done" then mode="play" restart() end
- else
+ end
+end
+
+function step()
+ if mode=="play" then
   if btn()>0 then started=true end
   if started then tm=min(tm+1,32000) end
   fade,splt,popt=max(fade-1),max(splt-dt),max(popt-dt)
@@ -72,10 +77,11 @@ function trigupd()
    if b.m==11 and b.k>cpi then
     cpi,cp,splt=b.k,{(b[1]+b[4])/2,b[2],(b[3]+b[6])/2,ang},2.5
     splits[cpi]=tm
-    sdel=dget(lv*8+cpi)>0 and tm-dget(lv*8+cpi)
+    local o=dget(lv*8+cpi)
+    sdel=o>0 and tm-o
     sfx(6)
    elseif b.m==12 then
-    -- finish line
+
     mode,best="done",dget(lv*8)
     newbest=best==0 or tm<best
     if newbest then
@@ -90,13 +96,11 @@ function trigupd()
  end
 end
 
--- m:ss.cc from frames
 function ft(f)
  local s=flr(f/60)
  return flr(s/60)..":"..sub("0"..s%60,-2).."."..sub("0"..flr(f%60*5/3),-2)
 end
 
--- outlined text (centered if no x)
 function pr(s,y,c,x)
  x=x or 64-#s*2
  for d=-1,1,2 do print(s,x+d,y,0) print(s,x,y+d,0) end
@@ -115,17 +119,17 @@ function _draw()
   if dget(lv*8)>0 then pr("best "..ft(dget(lv*8)),116,10) end
   return
  end
- -- timer, best time
+
  pr(ft(tm),2,7,2)
  if dget(lv*8)>0 then pr(ft(dget(lv*8)),9,5,2) end
- -- checkpoint split vs best
+
  if splt>0 then
   pr("checkpoint "..cpi..(sdel and "  "..(sdel<=0 and "-" or "+")..ft(abs(sdel)) or ""),20,sdel and sdel>0 and 8 or 11)
  end
- -- speed + flow meter
+
  rectfill(2,121,2+hs()/9*40,124,flow>.6 and 10 or flow>.3 and 9 or 13)
  rect(1,120,43,125,5)
- -- move popup + chain
+
  if popt>0 then
   pr(pop..(chain>1 and " x"..chain or ""),108-popt*4,popt>.3 and 7 or 6)
  end
@@ -147,27 +151,11 @@ function _draw()
   pr("flow score "..score,72,12)
   pr("🅾️ next level  ❎ retry",86,7)
  end
+ if dbg then print(stat(7).." "..stat(1).." "..#nb,1,9,7) end
 end
--->8
--- level data, written into cart
--- memory by tools/build.py.
--- 0x0000: 8 x 2-byte level address
--- level block:
---  16 display palette
---  11 sky: top,haze,sil a,sil b,
---     ground,sun,fog col,fog dist,
---     hint base,spawn heading,
---     silhouette height
---  15 materials x 4: top,side x,
---     side z,deco (lo=type hi=col)
---  2 box count, boxes x 10 bytes:
---  x,z,y:2 (/8) w,h,d:1 (/4)
---  mat:1 (lo=material hi=arg)
--- material flags (fixed per id):
--- 1 solid 2 climb 4 bouncy 8 trigger
+
 mflag=split"1,1,1,1,1,3,1,5,1,1,8,8,8,1,1"
 
--- read an n-byte value
 function rd(n)
  ra+=n
  return n>1 and peek2(ra-2) or peek(ra-1)
@@ -181,8 +169,7 @@ function setlv(l)
  for i=1,11 do sk[i]=rd(1) end
  for i=1,15 do mats[i]={rd(1),rd(1),rd(1),mflag[i],rd(1)} end
  for i=1,rd(2) do
-  local x,z,y=rd(2)/8,rd(2)/8,rd(2)/8
-  local w,h,d,m=rd(1)/4,rd(1)/4,rd(1)/4,rd(1)
+  local x,z,y,w,h,d,m=rd(2)/8,rd(2)/8,rd(2)/8,rd(1)/4,rd(1)/4,rd(1)/4,rd(1)
   local b={x,y,z,x+w,y+h,z+d,m=m%16,k=m\16,f=mflag[m%16]}
   if b.f&8>0 then
    add(trig,b)
@@ -191,20 +178,14 @@ function setlv(l)
    add(boxes,b) add(dl,b)
   end
  end
- -- player pseudo-box, sorted
- -- with the world for drawing
+
  plb={}
  add(dl,plb)
  restart()
 end
--->8
--- collision system
--- player = aabb at feet px,py,pz
--- radius r, height ph
 
 r=.3
 
--- gather boxes near the player
 function nearupd()
  nb={}
  for b in all(boxes) do
@@ -214,8 +195,6 @@ function nearupd()
  end
 end
 
--- first near solid overlapping
--- the given region
 function hit(x0,y0,z0,x1,y1,z1)
  for b in all(nb) do
   if x0<b[4] and x1>b[1] and y0<b[5] and y1>b[2] and z0<b[6] and z1>b[3] then
@@ -233,7 +212,6 @@ function solid(x,y,z)
  return hit(x-.05,y-.05,z-.05,x+.05,y+.05,z+.05)
 end
 
--- step onto low curbs/stairs
 function stepup(b)
  if st~="air" and st~="wallrun" and b[5]-py<.55 and not phit(b[5]+.01) then
   py=b[5]+.01
@@ -241,11 +219,6 @@ function stepup(b)
  end
 end
 
--- move by velocity, axis by axis.
--- sets wall/gnd contacts
--- push out on the side the
--- centre came from (also right
--- if already overlapping)
 function pmove()
  wall,gnd=nil
  local ox,oz=px,pz
@@ -266,8 +239,7 @@ function pmove()
  if b and vy~=0 then
   if vy<0 then
    py,gnd=b[5],b
-   -- prefer wide footing over
-   -- beams/ladder tops
+
    for o in all(nb) do
     if px-r<o[4] and px+r>o[1] and pz-r<o[6] and pz+r>o[3] and o[5]==py and not narrow(o) then gnd=o end
    end
@@ -281,24 +253,16 @@ end
 function hs()
  return sqrt(vx*vx+vz*vz)
 end
--->8
--- parkour detection + move
--- starters used by the states
 
 function narrow(b)
  return b and min(b[4]-b[1],b[6]-b[3])<.7
 end
 
--- low obstacle with free space
--- on top in front of us?
 function canvault(b)
  local h,x,z=b[5]-py,px+cos(ang)*.5,pz+sin(ang)*.5
  return h>.5 and h<1.4 and b.f&2==0 and not hit(x-r,b[5]+.02,z-r,x+r,b[5]+1.6,z+r)
 end
 
--- ledge in front of the hands,
--- top lo..hi above the feet,
--- with room to climb onto it
 function findledge(lo,hi)
  local x,z=px+cos(ang)*.6,pz+sin(ang)*.6
  for b in all(nb) do
@@ -309,8 +273,6 @@ function findledge(lo,hi)
  end
 end
 
--- face box b from the side the
--- player is outside of
 function snapface(b,zf,keep)
  if zf==nil then zf=max(b[1]-px,px-b[4])<=max(b[3]-pz,pz-b[6]) end
  if not zf then
@@ -323,16 +285,13 @@ function snapface(b,zf,keep)
  if not keep then ang,vx,vy,vz=atan2(-wnx,-wnz),0,0,0 end
 end
 
--- move feedback: name, flow, sfx
 function trick(n,f,s)
  pop,popt,idle=n,1,0
  chain+=1
- score=min(score+5*min(chain,20),32000)
- flow=mid(0,flow+f,1)
+ score,flow=min(score+5*min(chain,20),32000),mid(0,flow+f,1)
  if s then sfx(s) end
 end
 
--- a mistake: breaks the chain
 function brk(n,s)
  pop,popt,chain,idle=n,1,0,0
  flow*=.4
@@ -347,11 +306,11 @@ end
 function dojump()
  local h,jv=spd,6.2
  if spd<2.5 then
-  -- standing: precise hop
+
   h=iu and 3.6 or 0
  else
   jv=6+spd*.2
-  -- takeoff right at an edge
+
   if not solid(px+cos(ang)*.8,py-.3,pz+sin(ang)*.8) then
    h*=1.08 trick("edge jump",.06)
   end
@@ -365,22 +324,19 @@ end
 
 function startvault(b)
  vtop,vy0,vt=b[5],py,spd<3.6 and 1 or spd<6.3 and 2 or 3
- -- tall obstacles can't be
- -- speed vaulted cleanly
+
  if vtop-py>1.15 then vt=min(vt,2) end
  vdur,vspd=({.38,.2,.12})[vt],({min(spd,2.2),spd*.92,spd*1.04})[vt]
  trick(({"climb over","vault","speed vault"})[vt],vt*.05-.05,7)
  setst"vault"
 end
 
--- in-air ledge test: mantle low
--- ledges, hang from high ones
 function airgrab()
  if ngrab>0 or xx then return end
  local b=findledge(.1,2.15)
  if b then
   if b[5]-py<1.3 then
-   -- wall climbs flow into a vault
+
    spd=max(hs(),st=="wallup" and 4.5 or 0)
    startvault(b)
    return true
@@ -397,13 +353,10 @@ function airgrab()
 end
 
 function startpull()
- pa,pb={px,py,pz},{px+cos(ang)*.7,hb[5]+.01,pz+sin(ang)*.7}
- pdur=hcat and .3 or .5
+ pa,pb,pdur={px,py,pz},{px+cos(ang)*.7,hb[5]+.01,pz+sin(ang)*.7},hcat and.3or.5
  setst"pull"
 end
 
--- kick off a wall (tic-tac / wall
--- jump): keep along-wall speed vp
 function wallkick(vp,out,n)
  vx,vy,vz,jbuf=-wnz*vp+wnx*out,max(vy,6.6-kicks*1.3),wnx*vp+wnz*out,0
  kicks+=1
@@ -412,7 +365,6 @@ function wallkick(vp,out,n)
  trick(n,.1,4)
 end
 
--- jump away from a ledge/ladder
 function jumpback()
  ang+=.5
  vx,vy,vz,ngrab=cos(ang)*4.5,6.5,sin(ang)*4.5,.25
@@ -424,12 +376,8 @@ function bonk()
  vx,vz,spd,shake=0,0,0,.15
  brk("ouch",11)
 end
--->8
--- player physics + state machine
--- one update function per state
 
-g=20
-s={}
+g,s=20,{}
 
 function setst(n)
  st,stt,ph=n,0,1.8
@@ -442,11 +390,11 @@ function pupd()
  if jzp then jbuf=.12 end
  if xp then rbuf=.3 end
  s[st]()
- -- fell into the street
+
  if py<1 then
   sfx(11) respawn()
  end
- -- shadow height
+
  shy=-1
  for b in all(nb) do
   if px>b[1] and px<b[4] and pz>b[3] and pz<b[6] and b[5]<=py+.05 then shy=max(shy,b[5]) end
@@ -454,14 +402,11 @@ function pupd()
  anim()
 end
 
--- ground velocity from heading
 function gvel()
  vx,vy,vz=cos(ang)*spd,-3,sin(ang)*spd
  pmove()
 end
 
--- idle/walk/run/sprint/crouch
--- and balancing on beams
 s.ground=function()
  local nar,vmax=narrow(gb),6.2+flow*2.8
  if nar then
@@ -471,8 +416,7 @@ s.ground=function()
   ang+=turn*(.6-min(spd,9)*.04)*dt
  end
  if heavy>0 then heavy-=dt vmax=2.5 end
- -- crouch: x held slow, or
- -- no headroom
+
  ph=1.8
  crouch=xx and spd<3.5 or phit()
  if crouch then ph,vmax=1,1.6 end
@@ -483,8 +427,7 @@ s.ground=function()
  end
  if spd>vmax then spd=max(vmax,spd-6*dt) end
  spd=max(spd)
- -- momentum: flow builds while
- -- fast, drains when slow
+
  if spd>5.8 then flow=min(flow+.04*dt,1) end
  if spd<3 then flow=max(flow-.5*dt) end
  if spd<1.5 then
@@ -524,7 +467,7 @@ s.ground=function()
    end
    spd=0
   elseif into>0 then
-   -- glancing: slide along it
+
    local tx,tz=-wnz,wnx
    if cos(ang)*tx+sin(ang)*tz<0 then tx,tz=-tx,-tz end
    ang=atan2(tx,tz)
@@ -533,19 +476,16 @@ s.ground=function()
  end
 end
 
--- beam wobble grows with speed,
--- ⬅️➡️ counters it
 function balance()
  ang+=angd((gb[4]-gb[1]>gb[6]-gb[3] and (cos(ang)>0 and 0 or .5) or (sin(ang)>0 and .75 or .25))-ang)*.15
  balv=balv*.97+((rnd(2)-1)*(1+spd*.8)+bal*2.5-turn*5)*dt
  bal+=balv*dt
- -- drift sideways with the lean
+
  local lx,lz=-sin(ang)*bal,cos(ang)*bal
  px+=lx*.4*dt
  pz+=lz*.4*dt
  if abs(bal)>1 then
-  vx,vy,vz=lx*2,1,lz*2
-  bal,balv=0,0
+  vx,vy,vz,bal,balv=lx*2,1,lz*2,0,0
   brk("slipped",11)
   toair()
   return true
@@ -556,7 +496,7 @@ s.air=function()
  coy-=dt
  if jbuf>0 and coy>0 then dojump() return end
  vy=max(vy-g*dt,-30)
- -- limited air steering
+
  local da=turn*.2*dt
  local c,sn=cos(da),sin(da)
  ang+=da
@@ -569,11 +509,9 @@ s.air=function()
  peak=max(peak,py)
  if gnd then land() return end
  if airgrab() then return end
- -- holding z near a wall pulls
- -- you onto it (wallrun magnet)
+
  if not wall and jz and hs()>3.2 then
-  -- nearest probe first: a thin
-  -- wall hides what is behind it
+
   for sd in all(split"0,.4,-.4,.8,-.8") do
    local b=solid(px-sin(ang)*sd,py+1,pz+cos(ang)*sd)
    if b and not wall and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
@@ -585,19 +523,16 @@ s.air=function()
  if not wall then return end
  local vin,vp=max(-vx*wnx-vz*wnz),vz*wnx-vx*wnz
  if wall.f&2>0 and iu and vin>.5 then
-  -- catch a ladder/pipe mid-air
+
   startclimb()
  elseif jbuf>0 then
-  -- tic-tac: kick off, keep
-  -- the along-wall speed
+
   wallkick(vp,max(3.2,vin*.5),"tic-tac")
  elseif jz and abs(vp)>3.2 and abs(vp)>vin*.7 and wall~=lastwr then
-  -- wallrun
+
   wrs,lastwr=max(abs(vp),hs()*.85),wall
   wrt=.5+wrs*.12
-  wrmax=wrt
-  vy=mid(vy,1+wrs*.25,3.5)
-  ang=atan2(-wnz*vp,wnx*vp)
+  wrmax,vy,ang=wrt,mid(vy,1+wrs*.25,3.5),atan2(-wnz*vp,wnx*vp)
   trick("wallrun",.1,5)
   setst"wallrun"
  elseif jz and vin>2 and not wupd then
@@ -612,7 +547,7 @@ function land()
  local h,hv=peak-py,hs()
  if hv>.5 then ang=atan2(vx,vz) end
  spd,gb,coy,wupd,kicks,lastwr=hv,gnd,0,false,0
- -- awning: bounce up
+
  if gb.f&4>0 then
   toair()
   vy=jz and 12.5 or 11
@@ -633,7 +568,7 @@ function land()
    setst"roll"
    return
   end
-  -- too high even for a roll
+
   h-=4
  end
  if h>4.6 then
@@ -651,74 +586,13 @@ function land()
  end
 end
 
--- stunned after a bad landing
-s.land=function()
+s.land,s.roll,s.slide,s.vault,s.wallrun=function()
  spd=max(spd-10*dt)
  gvel()
  ph=1.2
  if stt>stun then setst"ground" end
-end
+end,function()spd=max(spd-2*dt)ang+=turn*.25*dt gvel()ph=.9if not gnd then toair()return end if jbuf>0and stt>.2and not phit(py+.9)then dojump()return end if stt>.45then setst"ground"end end,function()spd=max(spd-1.6*dt)ang+=turn*.15*dt ph=.8gvel()if not gnd then toair()return end if jbuf>0and not phit(py+1)then dojump()return end if wall then spd*=.5end if not xx and stt>.35or spd<2.5then ph=1.8if phit()then ph,spd=.8,max(spd,2.5)else setst"ground"end end end,function()local k=min(stt/vdur,1)py,vx,vy,vz=vy0+(vtop+.05-vy0)*k,cos(ang)*vspd*.3,0,sin(ang)*vspd*.3pmove()if k>=1then spd=vspd vx,vy,vz=cos(ang)*spd,vt==3and 2.5or 1.5,sin(ang)*spd toair()end end,function()wrt-=dt vy-=g*(.05+(1-wrt/wrmax)*.55)*dt wrs=max(wrs-dt)vx,vz=cos(ang)*wrs-wnx,sin(ang)*wrs-wnz pmove()if gnd then land()return end if airgrab()then return end if jbuf>0then wallkick((vz*wnx-vx*wnz)*.9,4.8,"wall jump")elseif not wall or wrt<=0or xp then vx+=wnx vz+=wnz setst"air"end peak=py end
 
-s.roll=function()
- spd=max(spd-2*dt)
- ang+=turn*.25*dt
- gvel()
- ph=.9
- if not gnd then toair() return end
- if jbuf>0 and stt>.2 and not phit(py+.9) then dojump() return end
- if stt>.45 then setst"ground" end
-end
-
-s.slide=function()
- spd=max(spd-1.6*dt)
- ang+=turn*.15*dt
- ph=.8
- gvel()
- if not gnd then toair() return end
- -- jump only with headroom
- if jbuf>0 and not phit(py+1) then dojump() return end
- if wall then spd*=.5 end
- if not xx and stt>.35 or spd<2.5 then
-  ph=1.8
-  if phit() then
-   -- still under something
-   ph,spd=.8,max(spd,2.5)
-  else
-   setst"ground"
-  end
- end
-end
-
-s.vault=function()
- local k=min(stt/vdur,1)
- py=vy0+(vtop+.05-vy0)*k
- vx,vy,vz=cos(ang)*vspd*.3,0,sin(ang)*vspd*.3
- pmove()
- if k>=1 then
-  spd=vspd
-  vx,vy,vz=cos(ang)*spd,vt==3 and 2.5 or 1.5,sin(ang)*spd
-  toair()
- end
-end
-
-s.wallrun=function()
- wrt-=dt
- vy-=g*(.05+(1-wrt/wrmax)*.55)*dt
- wrs=max(wrs-dt)
- vx,vz=cos(ang)*wrs-wnx,sin(ang)*wrs-wnz
- pmove()
- if gnd then land() return end
- if airgrab() then return end
- if jbuf>0 then
-  wallkick((vz*wnx-vx*wnz)*.9,4.8,"wall jump")
- elseif not wall or wrt<=0 or xp then
-  vx+=wnx vz+=wnz
-  setst"air"
- end
- peak=py
-end
-
--- run up a wall head-on
 function wallup(vin)
  wupd=true
  snapface(wall)
@@ -727,7 +601,7 @@ function wallup(vin)
  setst"wallup"
 end
 
-s.wallup=function()
+s.wallup,s.hang,s.pull=function()
  vx,vy,vz=-wnx*.5,vy-g*dt,-wnz*.5
  pmove()
  peak=max(peak,py)
@@ -738,41 +612,8 @@ s.wallup=function()
  elseif vy<-1.5 or not wall then
   setst"air"
  end
-end
+end,function()if stt<.12then return end if iu or jbuf>0and not id then startpull()elseif jbuf>0then jumpback()elseif xp then ngrab=.35toair()elseif turn~=0then local ox,oz,b=px,pz,hb px+=sin(ang)*turn*1.4*dt pz-=cos(ang)*turn*1.4*dt local x,z=px+cos(ang)*.6,pz+sin(ang)*.6if x<b[1]+.1or x>b[4]-.1or z<b[3]+.1or z>b[6]-.1or phit()then px,pz=ox,oz end aph+=dt*1.5end end,function()local k=min(stt/pdur,1)local a=lerp3(pa,pb,max(k*2-1))px,py,pz=a[1],lerp3(pa,pb,min(k*1.6,1))[2],a[3]if k>=1then spd,gb=hcat and iu and 4or 1setst"ground"end end
 
--- hanging / cat leap on a ledge
-s.hang=function()
- if stt<.12 then return end
- if iu or jbuf>0 and not id then
-  startpull()
- elseif jbuf>0 then
-  jumpback()
- elseif xp then
-  ngrab=.35
-  toair()
- elseif turn~=0 then
-  -- shimmy along the edge
-  local ox,oz,b=px,pz,hb
-  px+=sin(ang)*turn*1.4*dt
-  pz-=cos(ang)*turn*1.4*dt
-  local x,z=px+cos(ang)*.6,pz+sin(ang)*.6
-  if x<b[1]+.1 or x>b[4]-.1 or z<b[3]+.1 or z>b[6]-.1 or phit() then px,pz=ox,oz end
-  aph+=dt*1.5
- end
-end
-
-s.pull=function()
- local k=min(stt/pdur,1)
- local a=lerp3(pa,pb,max(k*2-1))
- px,py,pz=a[1],lerp3(pa,pb,min(k*1.6,1))[2],a[3]
- if k>=1 then
-  spd,gb=hcat and iu and 4 or 1
-  setst"ground"
- end
-end
-
--- ladders + drainpipes (yellow):
--- always face their broad side
 function startclimb()
  cb=wall
  local zf=cb[4]-cb[1]>cb[6]-cb[3]
@@ -782,7 +623,7 @@ function startclimb()
  sfx(4)
 end
 
-s.climb=function()
+s.climb,q=function()
  local d=(iu and 1 or 0)-(id and 1 or 0)
  py+=d*2.6*dt
  aph+=d*dt*1.2
@@ -797,97 +638,98 @@ s.climb=function()
   ngrab=.35
   toair()
  end
-end
--->8
--- procedural animation + 3d runner
--- pose q: 1 lean 2 side lean
--- 3 hip height 4/5 l thigh/knee
--- 6/7 r thigh/knee 8/9 l arm/elbow
--- 10/11 r arm/elbow 12 arm spread
--- 13 leg spread 14 body pitch
--- angles in turns, + = forward
+end,split"0,0,.93,0,.07,0,.07,0,.1,0,.1,0,0,0"
 
-q=split"0,0,.95,0,0,0,0,0,.1,0,.1,0,0,0"
-
--- key poses (q 1..13)
 poses={
- up=".06,0,.95,.25,.4,-.04,.2,.3,.25,-.1,.2,.06,.03",
- push=".08,0,.98,-.06,.03,-.02,.04,.2,.1,-.15,.1,.04,.02",
- fall="-.02,0,.95,.1,.18,.04,.12,.34,.12,.36,.12,.14,.05",
- reach="0,0,.95,.08,.08,.02,.06,.15,.15,.12,.15,.18,.05",
- slide="-.12,0,.42,.25,0,.08,.42,-.06,.05,.2,.15,.12,.04",
- roll=".15,0,.5,.38,.45,.38,.45,.3,.3,.3,.3,0,0",
- land=".14,0,.55,.3,.5,.3,.5,.1,.1,.1,.1,.08,.06",
- v1=".15,0,1,.42,.5,.02,.12,.12,.04,.12,.04,0,.02",
- v2=".08,.12,1,.25,.25,.22,.2,.05,.02,.3,.1,.08,.1",
- v3="-.05,.15,1.05,.32,.05,.3,.08,.02,0,.35,.1,.1,.03",
- cat=".02,0,.95,.25,.12,.25,.12,.42,.15,.42,.15,0,.05",
- crouch=".15,0,.55,.18,.25,.18,.25,0,.1,0,.1,0,.04"
+ push=".06,0,.95,-.3,.12,.2,.4,.15,.15,-.1,.15,.04,0",
+ up=".04,0,.95,-.1,.3,.15,.35,.12,.2,.05,.2,.08,0",
+ fall=".02,0,.95,0,.18,.1,.12,.15,.15,.12,.15,.15,0",
+ reach=".04,0,.93,.14,.08,.02,.12,.12,.12,.08,.12,.12,0",
+ slide="-.1,.03,.45,.75,.07,-.05,.07,-.12,.05,.15,.2,.1,0",
+ roll=".15,0,.6,.15,.4,.1,.35,.3,.3,.3,.3,0,0",
+ land=".14,0,.56,.18,.07,-.12,.07,.12,.15,.08,.15,.06,0",
+ v1=".15,0,1,.15,.45,.05,.5,.1,.08,.12,.08,0,0",
+ v2=".1,.08,1,.25,.4,.15,.45,.06,.04,.08,.04,.08,.12",
+ v3=".08,.12,1,.3,.45,.2,.5,.06,.02,.15,.12,.12,.2",
+ cat="0,0,.95,.25,.45,.25,.4,.46,.03,.46,.03,0,0",
+ hang="0,0,.95,.04,.1,-.03,.12,.46,.03,.46,.03,0,0",
+ wallup=".02,0,.95,.3,.4,.24,.15,.38,.12,.42,.12,.05,0",
+ climb="0,0,.95,.2,.3,.2,.3,.42,.1,.42,.1,0,0",
+ pull="0,0,.95,.04,.1,0,.12,.46,.2,.46,.2,0,0"
 }
 
--- copy values into t from i
-function ps(t,i,...)
- for k,a in ipairs{...} do t[i+k-1]=a end
-end
+function gait(t,h)
+ local f=1.1+h*.13
 
--- run/walk/climb cycle: legs and
--- arms in antiphase
-function cyc(t,amp,kn)
- local sl,cl=sin(aph)*amp,cos(aph)*amp
- ps(t,3,.95-abs(sl)*.25,sl,kn+max(cl)*1.8,-sl,kn+max(-cl)*1.8,-sl*.9,.15+amp*.7,sl*.9,.15+amp*.7)
+ rt=.75
+ aph+=f*dt
+ local d=min(.6,.5*f/h)
+ local s=h*d/f
+
+ t[3]=sqrt(.757-s*s/4)+.07-(.5-d)*.06*cos(aph*2-d)
+ for i=0,1 do
+  local p,x,u=(aph+i/2)%1,0,.07
+  if p<d then
+   x=s/2-s*p/d
+  else
+   p=(p-d)/(1-d)
+
+   x,u=sin(p)*.15-cos(p/2)*s/2,.07-sin(p/2)*(1.3-p)*(.08+h*.025)
+  end
+
+  local j=4+i*2
+  t[j],t[j+1],t[j+4],t[j+5]=x,u,.03-x*.22,.14+h*.008
+ end
+ t[1]=.01+h*.004
 end
 
 function anim()
- local t,h,n=split"0,0,.95,0,.02,0,.02,0,.08,0,.08,.02,.03,0",hs(),st
- -- body turns smoothly and leans
- -- into the turn
- local tu=angd(ang-bang)
+ rt=.3
+
+ local h,n,tu=hs(),st=="air" and (vy>0 and (stt<.12 and "push" or "up") or py-shy<1.2 and "reach" or "fall") or st=="vault" and "v"..vt or st=="hang" and hcat and "cat" or st,angd(ang-bang)
+ local t=split(poses[n] or "0,0,.93,.04,.07,-.04,.07,.03,.08,.03,.08,.03,0")
+ add(t,0)
+
  bang+=tu*.25
  if st=="ground" then
-  aph+=(h*.2+(h>.3 and .45 or 0))*dt
-  n=crouch and "crouch"
   if h>.3 then
-   local a=min(h/9,1)
-   cyc(t,.08+a*.22,.06+a*.12)
-   t[1]=.02+a*.07
+   gait(t,h)
+
+   t[1]+=mid(-.04,(h-oh)*.25,.03)
   else
-   t[1]=sin(time()/3)*.008
+
+   t[3]+=sin(time()/4)*.004
   end
+  if crouch then t[3]-=.3 t[1]+=.1 end
+
+  if lvy<-4 then lc=(-lvy-4)*.03 end
+  t[3]-=lc
   if narrow(gb) then
-   -- balance: arms out
-   ps(t,8,0,.08,0,.08,.23)
-   tu=bal*-.06
+
+   t[8],t[10],t[12],tu=0,0,.25,bal*-.06
   end
- elseif st=="air" then
-  n=vy>0 and (stt<.12 and "push" or "up") or py-shy<1.5 and "reach" or "fall"
- elseif st=="vault" then
-  n="v"..vt
- elseif st=="wallrun" or st=="wallup" then
-  aph+=(wrs+3)*.25*dt
-  cyc(t,.24,.18)
-  -- lean towards the wall
-  tu=(wnz*cos(ang)-wnx*sin(ang))*.15
-  t[12]=.12
-  if st=="wallup" then ps(t,1,-.04,0,.95,t[4]+.15,t[5],t[6]+.15,.1,.4,.1,.42) end
- elseif st=="hang" or st=="climb" then
-  n=st=="hang" and hcat and "cat"
-  local sw=sin(aph)*.06
-  t=split"0,0,.95,0,.06,0,.06,.47,.03,.47,.03,0,.05,0"
-  if st=="climb" then t=split"0,0,.95,.2,.3,.2,.3,.47,.03,.47,.03,0,.05,0" sw*=3 end
-  t[4]+=sw t[6]-=sw t[8]-=sw t[10]+=sw
+ elseif st=="wallrun" then
+  gait(t,wrs)
+
+  local w=wnx*sin(bang)-wnz*cos(bang)
+  t[2],t[12],t[13]=w*.04,.14,w*.2
+ elseif st=="climb" then
+  local w=sin(aph)*.12
+  t[5]+=w t[7]-=w t[8]-=w/3 t[10]+=w/3
  elseif st=="pull" then
+
   local k=stt/pdur
-  ps(t,1,.15*k,0,.95-k*.3,.35,.5,.1,.2,.45-k*.4,0,.45-k*.4)
+  t[1],t[8],t[10]=k*.15,.46-k*.42,.46-k*.42
+  if k>.35 then t[6],t[7]=.3,min(hb[5]-py,.5)+.07 end
  end
- if poses[n] then t=split(poses[n]) add(t,0) end
- t[2]-=tu*2
+ lvy,oh,lc=st=="air" and vy or 0,h,lc*.85
+
+ t[2]-=tu*(h+3)*.12
  if n=="roll" then t[14]=min(stt/.45,1) end
- for i=1,13 do q[i]+=(t[i]-q[i])*.3 end
+ for i=1,13 do q[i]+=(t[i]-q[i])*rt end
  q[14]=t[14]
 end
 
--- local (fwd,up,side) -> screen,
--- body pitch q[14] about the hip
 function jp(p)
  local f,u,s=unpack(p)
  local ur=u-q[3]
@@ -900,53 +742,22 @@ function jp(p)
  end
 end
 
--- next joint: length l at swing a,
--- sideways spread sp on side sd
 function seg(o,a,l,sp,sd)
  return {o[1]-sin(a)*cos(sp)*l,o[2]-cos(a)*cos(sp)*l,o[3]-sin(sp)*sd*l}
 end
 
--- point along the spine at t
 function spn(t,f,s)
- return {sdf*t+lcf*f,q[3]+sdu*t+lsf*f,sds*t+s}
+ return {sdf*t+lcf*f,q[3]+sdu*t+lsf*f,sds*t+s+sh}
 end
 
--- queue a tapered limb segment
 function cap(a,b,r,c)
  if a and b then add(bp,{(a[3]+b[3])/2,a,b,r,c}) end
 end
 
--- queue the visible faces of a box
--- along the spine: heights u0..u1,
--- half width w, half depth d,
--- shifted forward by o
-function tbox(u0,u1,w,d,o,cols)
- local cs,zc={},0
- for i=0,7 do
-  local t,dp=i>3 and u1 or u0,(i%4>1 and d or -d)+o
-  local c=jp(spn(t,dp,(i%2*2-1)*w))
-  if not c then return end
-  cs[i]=c
-  zc+=c[3]/8
- end
- for k,f in pairs(bfaces) do
-  local a,b,c,e=cs[f[1]],cs[f[2]],cs[f[3]],cs[f[4]]
-  local z=(a[3]+b[3]+c[3]+e[3])/4
-  -- faces nearer than the centre
-  -- face the camera
-  if z<zc then add(bp,{z,a,b,c,e,cols[k]}) end
- end
-end
-
--- front back right left top bottom
-bfaces={split"2,3,7,6",split"0,1,5,4",split"1,3,7,5",split"0,2,6,4",split"4,5,7,6",split"0,1,3,2"}
-
 function drawplayer()
  local l,sl,hp=q[1],q[2],q[3]
- bfx,bfz,pcr,psr,bp=cos(bang),sin(bang),cos(q[14]),-sin(q[14]),{}
- -- spine direction + forward axis
- sdf,sdu,sds,lcf,lsf=-sin(l),cos(l)*cos(sl),-sin(sl),cos(l),sin(l)
- -- shadow blob
+ bfx,bfz,pcr,psr,bp,sdf,sdu,sds,lcf,lsf,sh=cos(bang),sin(bang),cos(q[14]),-sin(q[14]),{},-sin(l),cos(l)*cos(sl),-sin(sl),cos(l),sin(l),(q[5]-q[7])*.06
+
  if shy>0 then
   local sc={}
   for i=0,3 do
@@ -956,27 +767,25 @@ function drawplayer()
  end
  local head=jp(spn(.76,0,0))
  if not head then return end
- -- which side faces the camera
- local cs=(cpos[1]-px)*-bfz+(cpos[3]-pz)*bfx>0 and 1 or -1
- local lg={}
+
+ local cs,lg=(cpos[1]-px)*-bfz+(cpos[3]-pz)*bfx>0 and 1 or -1,{}
  for sd=-1,1,2 do
-  local i,nr=sd<0 and 4 or 6,sd==cs
-  local th,kn,a,e,sp,lsp=q[i],q[i+1],q[i+4],q[i+5],q[12],q[13]
-  -- leg: hip, knee, ankle, toe
-  local h={0,hp,sd*.17}
-  local k=seg(h,th,.45,lsp,sd)
-  local an=seg(k,th-kn,.43,lsp,sd)
-  add(lg,{jp(h),jp(k),jp(an),jp(seg(an,th-kn+.25,.2,0,sd)),nr})
-  -- arm: shoulder, elbow, hand
-  local sh=spn(.47,0,sd*.24)
-  local el=seg(sh,a,.28,sp,sd)
+  local i,nr,h,az=sd<0 and 4 or 6,sd==cs,(q[6]-q[4])*sd*.05,sd*.12+q[13]
+  local f,u=q[i]-h,q[i+1]-hp
+  local d=max(sqrt(f*f+u*u),.05)
+  local x=(.0176+d*d)/2/d
+  local y=sqrt(max(.2025-x*x))
+  local k,an={h+(x*f-y*u)/d,hp+(x*u+y*f)/d,sd*.15+az/2+sh/2},{h+f,hp+u,az}
+
+  add(lg,{jp{h,hp,sd*.17+sh},jp(k),jp(an),jp{an[1]-(an[2]-k[2])*.46,max(an[2]+(an[1]-k[1])*.46,.02),az},nr})
+
+  local so=spn(.47,0,sd*.24)
+  local el=seg(so,q[i+4],.28,q[12],sd)
   local je=jp(el)
-  cap(jp(sh),je,.065,nr and 8 or 2)
-  cap(je,jp(seg(el,a+e,.26,sp,sd)),.055,15)
+  cap(jp(so),je,.065,nr and 8 or 2)
+  cap(je,jp(seg(el,q[i+4]+q[i+5],.26,q[12],sd)),.055,15)
  end
- -- two legs must always read as
--- two: every joint pair keeps a
--- leg width + 2px apart on screen
+
  local a,b=lg[1],lg[2]
  if a[1] and b[1] then
   local sg=sgn(b[1][1]-a[1][1])
@@ -995,64 +804,43 @@ function drawplayer()
   cap(g[2],g[3],.08,c)
   cap(g[3],g[4],.06,7)
  end
- -- pelvis, torso, backpack, neck
- tbox(-.1,.12,.16,.1,0,split"1,1,1,1,1,1")
- tbox(.1,.52,.2,.11,0,split"8,8,2,2,8,2")
- tbox(.16,.42,.13,.07,-.16,split"5,5,5,5,5,5")
- cap(jp(spn(.5,0,0)),head,.05,15)
- -- head: skin in front, hair behind
+
+ for p in all{split"0,.04,.15,1,0",split".18,.42,.19,8,0",split".22,.36,.12,5,-.12",split".5,.76,.05,15,0"} do
+  cap(jp(spn(p[1],p[5],0)),jp(spn(p[2],p[5],0)),p[3],p[4])
+ end
+
  cap(head,head,.15,15)
  local hb=jp(spn(.78,-.05,0))
  cap(hb,hb,.14,0)
- -- painter's order within the body
- for i=2,#bp do
-  local p,j=bp[i],i-1
-  while j>0 and bp[j][1]<p[1] do bp[j+1]=bp[j] j-=1 end
-  bp[j+1]=p
- end
+
+ isort(bp,1)
  for p in all(bp) do
   local a,b,r,c=unpack(p,2)
-  if #p>5 then
-   poly({a,b,r,c},p[6])
-  else
-   -- tapered capsule: a chain of
-   -- discs, radius by depth
-   local ra,rb=r*fl/a[3],r*fl/b[3]
-   local n=ceil(sqrt((b[1]-a[1])^2+(b[2]-a[2])^2)/max(ra,1))+1
-   for t=0,n do
-    t/=n
-    circfill(a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,ra+(rb-ra)*t,c)
-   end
+
+  local ra,rb=r*fl/a[3],r*fl/b[3]
+  for t=0,1,.2 do
+   circfill(a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,ra+(rb-ra)*t,c)
   end
  end
 end
--->8
--- third-person camera
--- lags behind the heading, pulls
--- back + widens fov with speed,
--- never clips into walls
 
--- shortest signed angle diff
 function angd(a)
  return (a+.5)%1-.5
 end
 
 function camreset()
- cyaw,fl=ang,70
- cam,look={px-cos(ang)*4,py+3,pz-sin(ang)*4},{px,py+1,pz}
+ cyaw,fl,cam,look=ang,70,{px-cos(ang)*4,py+3,pz-sin(ang)*4},{px,py+1,pz}
  camupd()
 end
 
 function camupd()
  local h=hs()
- cyaw+=angd(ang-cyaw)*((st=="hang" or st=="climb" or st=="wallup") and .03 or .05+h*.005)
+ cyaw+=angd(ang-cyaw)*(st=="hang" and .03 or .05+h*.005)
  local d,fx,fz=2.6+h*.13,cos(cyaw),sin(cyaw)
- -- above + behind, looking down
- -- at the runner and ahead
+
  local t,w,lk={px,py+1.4,pz},{px-fx*d,py+2.5+h*.04,pz-fz*d},{px+cos(ang)*(1+h*.3),py+.9,pz+sin(ang)*(1+h*.3)}
  if st=="wallrun" then w[1]+=wnx*.9 w[3]+=wnz*.9 end
- -- boom collision: stop before a
- -- solid; too close -> lift up
+
  for k=.15,1,.15 do
   if solid(unpack(lerp3(t,w,k))) then
    w=k<.55 and {px-fx*.3,py+3,pz-fz*.3} or lerp3(t,w,k-.15)
@@ -1072,28 +860,20 @@ function camupd()
  cfw={ccy*ccp,csp,csy*ccp}
 end
 
--- world -> camera space
 function tocam(x,y,z)
  x-=cpos[1] y-=cpos[2] z-=cpos[3]
  local f=x*ccy+z*csy
  return z*ccy-x*csy,y*ccp-f*csp,f*ccp+y*csp
 end
 
--- camera space -> screen
 function proj(c)
  local z=c[3]
- return {64+c[1]*fl/z,64-c[2]*fl/z}
+ c.s=c.s or {64+c[1]*fl/z,64-c[2]*fl/z}
+ return c.s
 end
--->8
--- 3d rendering: painter's sort
--- of boxes, near-plane clipping,
--- scanline polygons, fog, sky
 
-near=.2
+near,fr=.2,0
 
--- convex polygon fill: downward
--- edges fill one side, upward
--- edges the other
 function poly(v,c)
  local l,rr,y0,y1={},{},999,-1
  for i=1,#v do
@@ -1112,8 +892,6 @@ function poly(v,c)
  for y=y0,y1 do rectfill(l[y] or 0,y,rr[y] or 0,y,c) end
 end
 
--- clip camera-space polygon
--- against the near plane
 function cpoly(vs,c)
  local o,n={},#vs
  for i=1,n do
@@ -1127,30 +905,28 @@ function cpoly(vs,c)
  if #o>2 then poly(o,c) end
 end
 
+function isort(t,k)
+ for i=2,#t do
+  local p,j=t[i],i-1
+  while j>0 and t[j][k]<p[k] do t[j+1]=t[j] j-=1 end
+  t[j+1]=p
+ end
+end
+
 function lerp3(a,b,t)
  return {a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,a[3]+(b[3]-a[3])*t}
 end
 
--- point on face quad (u across,
--- t up) for decorations
 function fp(q,u,t)
  return lerp3(lerp3(q[1],q[4],u),lerp3(q[2],q[3],u),t)
 end
 
--- corner order per axis so that
--- 1-2 and 4-3 are vertical edges
-faces={split"0,2,6,4",split"0,1,5,4",split"0,2,3,1"}
-ubx=split"-999,-999,999,999"
-fpat={0x3333,0x5555,0x7777,0x5a5a}
-dpat=split"0,0xf0f0,0,0x3333,0,0,0,0xa5a5"
+function fq(q,u,t,v,w)
+ return {fp(q,u,t),fp(q,u,w),fp(q,v,w),fp(q,v,t)}
+end
 
--- must a be drawn before b?
--- every separating plane must have
--- the camera on the same side (if
--- not, or the camera is between
--- them, they can't overlap: no
--- constraint). intersecting boxes
--- fall back to distance
+faces,ci,cj,ck,fpat,dpat={split"1,3,7,5",split"1,2,6,5",split"1,3,4,2"},split"1,4,1,4,1,4,1,4",split"2,2,5,5,2,2,5,5",split"3,3,3,3,6,6,6,6",{0x3333,0x5555,0x7777,0x5a5a},split"0,0xf0f0,0,0x3333,0,0,0,0xa5a5"
+
 function behind(a,b)
  local r
  for i=1,3 do
@@ -1170,18 +946,12 @@ end
 
 function render()
  sky()
- -- player pseudo-box joins sort
+
  plb[1],plb[2],plb[3],plb[4],plb[5],plb[6]=px-r,py,pz-r,px+r,py+ph,pz+r
- -- d: centre distance (tie
- -- break), e: gap distance (fog),
- -- f: depth of the nearest
- -- corner (all behind: culled).
- -- boxes in range and in front
- -- get camera-space corners and
- -- screen bounds
+
  local v={}
- for b in all(dl) do
-  local d,e,f,bx=0,0,0
+ for k=1,#dl do
+  local b,d,e,f=dl[k],0,0,0
   for i=1,3 do
    local c,m=cpos[i],(b[i]+b[i+3])/2
    d+=abs(m-c)
@@ -1190,23 +960,32 @@ function render()
   end
   b.d,b.e=d,e
   if e<sk[8]+24 and f>near then
-   bx,b.cs=split"999,999,-999,-999",{}
-   b.bx=bx
-   for i=0,7 do
-    local c={tocam(b[1+i%2*3],b[2+flr(i/2)%2*3],b[3+flr(i/4)*3])}
-    b.cs[i]=c
-    -- corner behind us: unbounded
-    local s=c[3]>near and proj(c) or ubx
-    bx[1],bx[2],bx[3],bx[4]=min(bx[1],s[1]),min(bx[2],s[2]),max(bx[3],s[3] or s[1]),max(bx[4],s[4] or s[2])
+   local x0,y0,x1,y1,cs=999,999,-999,-999,{}
+   for i=1,8 do
+    local c={tocam(b[ci[i]],b[cj[i]],b[ck[i]])}
+    cs[i]=c
+    if c[3]<near then
+
+     x0,y0,x1,y1=-999,-999,999,999
+    else
+     local s=proj(c)
+     x0,y0,x1,y1=min(x0,s[1]),min(y0,s[2]),max(x1,s[1]),max(y1,s[2])
+    end
+   end
+   b.cs,b.bx=cs,{x0,y0,x1,y1}
+
+   if x1>=0 and x0<128 and y1>=0 and y0<128 then
+    if e<sk[8]+10 then
+     add(v,b)
+    elseif x0>-999 then
+     rectfill(x0,y0,x1,y1,sk[7])
+    end
    end
   end
-  -- on screen?
-  if e<sk[8]+24 and f>near and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 then add(v,b) end
  end
- -- painter's order: topological
- -- sort over screen-overlapping
- -- pairs (dfs, back to front)
- fr=(fr or 0)+1
+
+ isort(v,"d")
+ fr+=1
  local function visit(b)
   if b.mk~=fr then
    b.mk=fr
@@ -1214,7 +993,7 @@ function render()
    for i=1,#v do
     local a=v[i]
     local p=a.bx
-    if p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
+    if a.mk~=fr and p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
    end
    if b==plb then drawplayer() else drawbox(b) end
   end
@@ -1225,51 +1004,41 @@ function render()
 end
 
 function drawbox(b)
- local m,cs=mats[b.m],b.cs
- local fog=b.e>sk[8]+14 and 2 or b.e>sk[8] and 1 or 0
+ local m,cs,fog=mats[b.m],b.cs,b.e>sk[8]
  for ax=1,3 do
   for sd=0,1 do
    if sd==0 and cpos[ax]<b[ax] or sd==1 and cpos[ax]>b[ax+3] then
     local q={}
     for k in all(faces[ax]) do add(q,cs[k+sd*(ax==3 and 4 or ax)]) end
     local c=ax==2 and sd==1 and m[1] or m[ax==1 and 2 or 3]
-    if fog==2 then c=sk[7] elseif fog==1 then fillp(0x5a5a) c+=sk[7]*16 end
+    if fog then fillp(0x5a5a) c+=sk[7]*16 end
     cpoly(q,c)
     fillp()
-    -- details only with cpu to spare
-    if ax~=2 and fog==0 and stat(1)<.9 then deco(b,m[5],q,c) end
+
+    if ax~=2 and not fog and stat(1)<.9 then deco(b,m[5],q,c) end
    end
   end
  end
 end
 
--- surface details on vertical
--- faces. deco: lo=type hi=colour
--- 1 window bands 3 poster 5 vent
--- 6 neon outline 7 cross brace
--- 2/4/8 full pattern (rungs,
--- stripes, rough stone/grime)
 function deco(b,dk,q,c)
  local h,t,k=b[5]-b[2],dk%16,dk\16
  if t==1 and h>3 then
   fillp(fpat[flr(b[1]+b[3])%3+1])
   for y=1.4,h-1.2,3 do
-   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+k*16)
+   cpoly(fq(q,.06,y/h,.94,(y+1.3)/h),c+k*16)
   end
  elseif t==3 and h>1.5 then
   fillp(fpat[b.k%4+1])
-  cpoly({fp(q,.08,.15),fp(q,.08,.85),fp(q,.92,.85),fp(q,.92,.15)},({0xa9,0x7c,0xeb,0xb3})[b.k%4+1])
+  cpoly(fq(q,.08,.15,.92,.85),({0xa9,0x7c,0xeb,0xb3})[b.k%4+1])
  elseif t==5 then
   fillp(0x0f0f)
-  cpoly({fp(q,.2,.25),fp(q,.2,.75),fp(q,.8,.75),fp(q,.8,.25)},c+k*16)
- elseif t==6 or t==7 then
-  local s={}
-  for v in all(q) do
-   if v[3]<near then return end
-   add(s,proj(v))
-  end
-  for i=1,t==6 and 4 or 2 do
-   local a,e=s[i],s[t==6 and i%4+1 or i+2]
+  cpoly(fq(q,.2,.25,.8,.75),c+k*16)
+ elseif t==7 then
+  for i=1,2 do
+   local a,e=q[i],q[i+2]
+   if a[3]<near or e[3]<near then return end
+   a,e=proj(a),proj(e)
    line(a[1],a[2],e[1],e[2],k)
   end
  elseif t>0 then
@@ -1279,7 +1048,6 @@ function deco(b,dk,q,c)
  fillp()
 end
 
--- sky gradient, sun, skyline
 function sky()
  local hy=mid(-20,64+fl*csp/ccp,150)
  cls(sk[1])
@@ -1289,7 +1057,7 @@ function sky()
  rectfill(0,hy-18,127,hy,sk[2])
  local yaw=atan2(ccy,csy)
  if sk[6]>0 then circfill(64-angd(.1-yaw)*fl*6,hy-30,7,sk[6]) end
- -- distant silhouettes
+
  for i=0,47 do
   local x,hh=64-angd(i/48-yaw)*fl*6,(i*37%11+3)*fl*sk[11]/240
   rectfill(x-6,hy-hh,x+6,hy,i%3==0 and sk[3] or sk[4])
@@ -1298,8 +1066,6 @@ function sky()
  rectfill(0,hy,127,hy+2,sk[7])
 end
 
--- next checkpoint marker (seen
--- through walls as a guide)
 function beacon()
  for b in all(trig) do
   if b.m==12 or b.m==11 and b.k==cpi+1 then
@@ -1311,15 +1077,13 @@ function beacon()
   end
  end
 end
--->8
--- speed lines at high speed
 
 function fxdraw()
  local h=hs()
  for i=1,mode=="play" and (h-6.5)*2 or 0 do
   local a,d=rnd(),50+rnd(40)
-  local e=d+h*1.5
-  line(64+cos(a)*d,64+sin(a)*d*.8,64+cos(a)*e,64+sin(a)*e*.8,7)
+  local c,s,e=cos(a),sin(a)*.8,d+h*1.5
+  line(64+c*d,64+s*d,64+c*e,64+s*e,7)
  end
 end
 __gfx__
@@ -1377,7 +1141,7 @@ c0c1d4094008008300c0c0a0b3094066008300c0c040b309408bff0100c0c045b30b4003008000c3
 40870063004710e0708e40c70001004031a0400650c70001004031a0408c50c70001004031a0400350670001006041106008400600830081c0c1d50e50060001
 0002028220ed5007000100100260608b50c70083008050a0908e508600050081c002c00a0004100000c087c020032009100000c00ac010014086100000c0c8c0
 200a5004100000c046c0100e1001ff0000c087c020064001ff0000c007c01000000f0000000a0405100d20041000008705051004600bff000005840a10001020
-3848506870809078b81858e0f000000000000000e0b10c0060d0d085d03030159040205560505070d0505000a0909020b0b030300000000040402000a0a0a067
+3848506870809078b81858e0f000000000000000e0b10c0060d0d085d03030159040205560505070d0505000a0909020b0b030300000000040402000a0a0a057
 000000000000000000000000500000006090901a27008fff8fff000006808ae000000000010042500a1086000000010042500a108fff0000010040c10a200b00
 0000010040c10a208fff8fff010006c140208fff8fff840006208a208fff0410010082c1402086000410010082c1402083000500a100407140e007000500a100
 407140e083000a00a100407140e007000a00a100407140e083000f00a100407140e007000f00a100407140e001000600a1004040c03089000b00a1004040c030
@@ -1451,42 +1215,11 @@ a0f0000045100100c041a0f0000086100100c0e1c0f000000f00010081c081d100000810050082c0
 0000c400812005100b0004108500812020500e0009008500204183704c000d00e400601060904c000b00e400601060904b000a00e400101082500b0000100500
 81c081d28b0006000500014060300d0000000500600210600b0002002600c01080900b0080006700c01080900b00e2004600106110500b006100870010c01050
 6c00e2004600106110506c006100870010c0105000000cff090007c0c0b203000000c8000120031003000c00c80001200610430081000900c040603003000400
-__gff__
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 9800100202053c0074008e00060106093c0090008e00060106093c00ac008e0006010609320060008e0001013005300000009000100c083d4000200190000810300232007e0190000620010630004801a2000801080930006401b6000801080900008001d000700c183b9000f000cc001002480190000000cc00100248019800
 4001d00008030c08ac009000ce00010130059c00a000ce00060106099c00bc00ce00060106099c00d800ce000601060994005000d0000c04060390004001d000100c184d90000000d00008102002a2000000d00006200106a0002000e40008010809a0000800f800080108098000c0ff1001300c0c4b7e00feff100106200106
 6200c8ff10010c0a0a0f6200dcff10010c140a0f6200f0ff10010c1e080f5000d0ff1001081018020000c0ff1001700c0c5d500000005001200c0c5b580070005001180406035000d0005a012002020560002001500110050803500060015001200c100cc0feb0ff000030e0380e90015000000030c8380ee0fe9001000030a0
 38016001e001000030f0300e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
 000300001e62500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00020000164311d430224250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -1626,20 +1359,20 @@ cccc777c777c777c7c7cc777777c777cccccccccccccccccccccccccccccccccccc50505000ccccc
 cccc7c7c7c7c7c7c7c7c777777777c7ccccccccccccccccccccccccccccccccccc550505000ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccc777c777c77cc77c77777777777cccccccccccccccccccccccccccbcccccccc550505000ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 6c6c7c6c7c7c7c7c7c7777777777777c6c6c6c6c6c6c6c6c6c6c6c6cbbbc6c6c6c550505000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
-c6c676c6767676767677777777777776c6c6c6c6c6c6c6c6c6c6c6c6cbc6c6c6c65505050006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
-6c6c6c6c6c6c6c6c67777777777777776c6c6c6c6c6c6c6c6c666c6c6c6c6c6c6c555505000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
+c6c676c6767676767677777777777776c6c6c6c6c6c6c6c6c6c666c6cbc6c6c6c65505050006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
+6c6c6c6c6c6c6c6c67777777777777776c6c6c6c6c6c6c6c6c66666c6c6c6c6c6c555505000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 c6c6c6c6c6c6c6c6c777777777777777c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c65555050006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
 6c6caaac6c6cac6caaa7a7a7aaa7a7776aac6c6c6aacaaac6c66aaacac6c6aacaca55505000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 c6c6a6a6c6c6a6c6a777a7a7a777a777a6c6c6c6a6a6a6c6c6c6a6c6a6c6a6a6a6a555050006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
 6c6caaac6c6cac6caa77a7a7aa77a777aaac6c6cacacaa6c6c66aa6cac6cacacaca55505000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 c6c6a6a6c6c6a6c6a677aaa7a777a776c6a6c6c6a6a6a6c6c6c6a6c6a6c6a6a6aaa550050006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
-6c6caaac6c6caaacaaa77a77aaa7aaacaa6c6c6caa6cac6c6c66ac6caaacaa6caaa55005000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
+6c6caaac6c6caaacaaa77a77aaa7aaacaa6c6c6caa6cac6c6c66a66caaacaa6caaa55005000c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 c6c6c6c6c6c6c6c6c6c77777777777c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
-6c6c6c6c6c6c6c6c6c6c777777777c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
+6c6c6c6c6c6c6c6c6c6c777777777c6c6c6c6c6c6c6c6c6c6c66666c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 c6c6c6c6c6c6c6c6c6c6c6777776c6c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6
-6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
+6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c66666c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c
 6666c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6666666666666
-66666c6c6c6c6c6c6666666666666c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c666666666666
+66666c6c6c6c6c6c6666666666666c6c6c6c6c6c6c6c6c6c6c66666c6c6c6c6c6c555005006c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c666666666666
 6666c6c6c6c6c6c666666666666666c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6c6666666666666
 66666666666666666666666666666666666666666666666666666666666666666655500500666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666655500500666666666666666666666666666666666666666666666666666666
@@ -1649,68 +1382,67 @@ c6c6c6c6c6c6c6c6c6c6c6777776c6c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6
 6666666666666666666666666666666666666666666666666660a906666666666655505500666666666666666666666666666666666666666666666666666666
 6666666666666666666666666666666666666666666666666660a906666666666655505500666666666666666666666666666666666666666666666666666666
 6666666666666666666666666666666666666666666666666660a9006666666666555055006666666666666dddddddd666666666666666666666666666666666
-6666666666666666666666666666666666646464646464646460a9009464646464555055006666646466666dddddddd66666666666666666dddddddd66666666
-6666666666666666666666666666666666464646464646464640a9009946464646555055006666464666666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666646464646464646460a9009964646464555050006664646466666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666666666666646464640a9009906464646555050006666464666666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666666666666464646660a9009900646464555050006664646466666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666666666666646464640aa009900464646555050006666464666666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666666666666464646460aa009900946464555050006664646466666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666666666666666666646464640aa009900964646555050006666464666666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666646466666664646464646460aa009900946464555050006464646464666dddddddd66666666666666666dddddddd66666666
-666666666666ddddddddd6666666664646666646464646464640aa009900964646555050004646464646466dddddddd66666666666666666dddddddd66666666
-6666666666666666666666666666646464666664646464646460aa00990094646455505004646464646466666666666666666666666666666666666666666666
-6666666666666666666666666666664646666646464646464640aa00990096464655505006464646464646666666666666666666666666666666666666666666
-6666666666666666666666666666666464666664646464646460aa00990094646455505004646464646466666666666666666666666666666666666666666666
-4444444444444444444444444444444646666666464646464640aa00990096464655505006464646464644444444444444444444444444444444444444444444
-4444444444444444444444444444446464666664646464646464aa00990094646455505004646464646464444444444444444444444444444444444444444444
-4444444444444444444444444444444646666666464646464646aa00990096464655505006464646464644444444444444444444444444444444444444444444
-4444444444444444444444444444446464666664646464636363aa00990094646455505004646464646444444444444444444444444444444444444444444444
-4444444444444444444444444444444646466666464646463636aa00990096464655505006464646464644444444444444444444444444444444444444444444
+6666666666666666666666666666666666666666666666666660a9009666666666555055006666666666666dddddddd66666666666666666dddddddd66666666
+6666666666666666666666666666666666666666666666666660a9009966666666555055006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660a9009966666666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660a9009906666666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660a9009900666666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660aa009900666666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660aa009900966666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666666666666666666666666660aa009900966666555050006666666666666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666646464646464646464646460aa009900946464555050006464646464666dddddddd66666666666666666dddddddd66666666
+666666666666ddddddddd6666666664646464646464646464640aa009900964646555050004646464646466dddddddd66666666666666666dddddddd66666666
+6666666666666666666666666666646464646464646464646460aa00990094646455505004646464646466666666666666666666666666666666666666666666
+6666666666666666666666666666664646464646464646464640aa00990096464655505006464646464646666666666666666666666666666666666666666666
+6666666666666666666666666666666464646464646464646460aa00990094646455505004646464646466666666666666666666666666666666666666666666
+4444444444444444444444444444444646464646464646464640aa00990096464655505006464646464644444444444444444444444444444444444444444444
+4444444444444444444444444444446464646464646464646464aa00990094646455505004646464646464444444444444444444444444444444444444444444
+4444444444444444444444444444444646464646464646464646aa00990096464655505006464646464644444444444444444444444444444444444444444444
+4444444444444444444444444444446464646464646464636363aa00990094646455505004646464646444444444444444444444444444444444444444444444
+4444444444444444444444444444444646464646464646463636aa00990096464655505006464646464644444444444444444444444444444444444444444444
 4444444444444444444444444666666666666666666666666666aa00990096666655505006666666666666644444444444444444444444444444444444444444
 444444444444444444444446d6d6d6d6d6d6d6d6d6d6d6d6d6d6aa0099009444445550500449d6d6d6d6d6d6d444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa0099004444445550500444994444444d6d4444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa00990044444445505004444994444446d64444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa0099004444444550500444449944444d6d4444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa00990444444444505004444444994446d64444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa0099044444444450500444444449946d6d4444444444444444444444444444444444444444
-4444444444444444444444446666444444444444444444444444aa00994444444444505004444444449996d64444444444444444444444444444444444444444
-4444444444444444444444444666644444444444444444444444aa009944444444445050044444444449996d4444444444444444444444444444444444444444
-4444444444444444444444444666644444444444444444444444aa00944444000444445004444444444449994444444444444444444444444444444444444444
-4444444444444444444444444666644444444444444444444444aa00944440000044445004444444444444999444444444444444444444444444444444444444
-4444444444444444444444444666644444444444444444444444aa00944440000044455004444444444444499944444444444444444444444444444444444444
-4444444444444444444444444666644444444444444444444444aa00444440000044455004444444444464449999444444444444444444444444444444444444
-444444444444444444444444446666444444444444444444444444444444440004444550044444444444d6444499944444444444444444444444444444444444
-444444444444444444444444446666444444444444444444444444444444444f444445500444444444446d644449999444444444444444444444444444444444
-4444444444444444444444444466664444444444444444444444444444f2444f44448550044444444444d6d44444999944444444444444444444444444444444
-444444444444444444444444446666444444444444444444444444444422244f4448884444444444444d6d644444499999444444444444444444444444444444
-444444444444444444444444446666444444444444444444444444444422888888888844444444444446d6d44444444999944444444444444444444444444444
-44444444444444444444444444466644444444444444444444444444442285555558884444444444444d6d644444444499994444444444444444444444444444
-444444444444444444444444444666644444444444444444444444444422855555588844444444444446d6d44444444449999944444444444444444444444444
-44444444444444444444444444466664444444444444444444444444444285555558884444444444444d6d444444444444999994444444444444444444444444
-444444444444444444444444444666644444444444444444444444444444855555588844444444444446d6444444444444449999944444444444444444444444
-44444444444444444444444444466664444444444444444444444444444485555558844444444444444d6d444444444444444999994444444444444444444444
-444444444444444444444444444666644444444444444444444444444444888888884444444444444446d6444444444444444499999944444444444444444444
-44444444444444444444444444446664444444444444444444444444444401111111444444444444444d6d444444444444444449999994444444444444444444
-444444444444444444444444444466664444444444444444444444444440011111111444444444444446d6444444444444444444499999444444444444444444
-66666666666666666666666666666666666666666666666666666666666001111111166666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666666601111111166666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666666000666661116666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666666000666661116666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666660006666666117666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666666066666666677766666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666660006666666677766666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666660006666666777666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666600066666666777666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666600066666666777666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666600066555566676666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666000665555556666666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666070555555555566666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666777555555555556666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666777655555555666666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666777665555556666666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666777666555566666666666666666666666666666666666666666666666666666666666666
-66666666666666666666666666666666666666666666666666666666676666666666666666666666666666666666666666666666666666666666666666666666
+4444444444444444444444466666666666444444444444444444aa00990044444455505004449944466666666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00990044444445505004444994466666666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00990044444445505004444499466666666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00990444444444505004444444996666666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00990444444444505004444444499666666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00994444444444505004444444449996666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00994444444444505004444444444999666444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00944444400044445004444444464449996444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00944444000004445004444444466444999444444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00944444000004455004444444466644499944444444444444444444444444444444444444
+4444444444444444444444466666666666444444444444444444aa00444444000004455004444444466664449999444444444444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444444444f000f4455004444444466666444499944444444444444444444444444444444444
+444444444444444444444446666666666644444444444444444444444444444fff44455004444444466666664449999444444444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444444444488844455004444444466666666444999944444444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444444244888884844444444444466666666444499999444444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444442228855588884444444444466666666444444999944444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444442228555558884444444444466666666444444499994444444444444444444444444444
+44444444444444444444444666666666664444444444444444444444442228555558884444444444466666666444444449999944444444444444444444444444
+44444444444444444444444666666666664444444444444444444444442228555558888444444444466666666444444444999994444444444444444444444444
+44444444444444444444444666666666664444444444444444444444442228555558484444444444466666666444444444449999944444444444444444444444
+4444444444444444444444466666666666444444444444444444444444f248555558444444444444466666666444444444444999994444444444444444444444
+44444444444444444444444666666666664444444444444444444444444448855588444444444444466666666444444444444499999944444444444444444444
+44444444444444444444444666666666664444444444444444444444444440111111444444444444466666666444444444444449999994444444444444444444
+44444444444444444444444666666666664444444444444444444444444400111111144444444444466666666444444444444444499999444444444444444444
+66666666666666666666666666666666666666666666666666666666666000111111666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666000611111166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666606666611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666000666611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666000666661666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666600066611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666660666611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666600066661666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666600066611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666660666611166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666666555561666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666665555511166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666555555511166666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666665555555711556666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666655555111666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666665555516666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666666555566666666666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
@@ -1746,3 +1478,7 @@ c6c6c6c6c6c6c6c6c6c6c6777776c6c6c6c6c6c6c6c6c6c6c6c666c6c6c6c6c6c655500500c6c6c6
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
 66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
+66666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666
+__meta:title__
+parkour: rooftops
+third-person 3d parkour

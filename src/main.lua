@@ -12,7 +12,10 @@ function _init()
  menuitem(1,"restart level",restart)
  menuitem(2,"last checkpoint",respawn)
  menuitem(3,"level select",function() mode="title" end)
- music(0,2000)
+ -- debug: fps, cpu, collision
+ -- boxes near the runner
+ menuitem(4,"perf overlay",function() dbg=not dbg end)
+ music(0)
  mode="title"
  setlv(0)
 end
@@ -25,7 +28,7 @@ end
 -- reset player at checkpoint
 function respawn()
  px,py,pz,ang=unpack(cp)
- for k in all(split"vx,vy,vz,spd,flow,chain,idle,bal,balv,heavy,ngrab,jbuf,rbuf,coy,kicks,aph,shake,stun,popt,splt,shy,wrs") do _ENV[k]=0 end
+ for k in all(split"vx,vy,vz,spd,flow,chain,idle,bal,balv,heavy,ngrab,jbuf,rbuf,coy,kicks,aph,shake,stun,popt,splt,shy,wrs,lc,lvy,oh") do _ENV[k]=0 end
  peak,pop,fade,bang,crouch,gb,wupd,lastwr=py,"",12,ang
  setst"ground"
  nearupd()
@@ -39,11 +42,22 @@ function inp()
  turn=(btn(0) and 1 or 0)-(btn(1) and 1 or 0)
 end
 
-function _update60()
+-- 30 fps: one drawn frame runs
+-- two fixed 1/60s steps, so the
+-- physics never depends on how
+-- long drawing takes
+function _update()
  inp()
+ menu()
+ step()
+ jzp,xp=nil
+ step()
+end
+
+function menu()
  if mode~="play" then
   if mode=="title" then
-   ang+=.0008
+   ang+=.0016
    -- level select: next level
    -- unlocks once this one's done
    if btnp(0) then setlv(lv-1) end
@@ -52,7 +66,11 @@ function _update60()
    setlv(lv+1)
   end
   if jzp or xp and mode=="done" then mode="play" restart() end
- else
+ end
+end
+
+function step()
+ if mode=="play" then
   if btn()>0 then started=true end
   if started then tm=min(tm+1,32000) end
   fade,splt,popt=max(fade-1),max(splt-dt),max(popt-dt)
@@ -69,7 +87,8 @@ function trigupd()
    if b.m==11 and b.k>cpi then
     cpi,cp,splt=b.k,{(b[1]+b[4])/2,b[2],(b[3]+b[6])/2,ang},2.5
     splits[cpi]=tm
-    sdel=dget(lv*8+cpi)>0 and tm-dget(lv*8+cpi)
+    local o=dget(lv*8+cpi)
+    sdel=o>0 and tm-o
     sfx(6)
    elseif b.m==12 then
     -- finish line
@@ -144,4 +163,5 @@ function _draw()
   pr("flow score "..score,72,12)
   pr("🅾️ next level  ❎ retry",86,7)
  end
+ if dbg then print(stat(7).." "..stat(1).." "..#nb,1,9,7) end
 end
