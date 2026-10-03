@@ -42,9 +42,9 @@ function stepup(b)
 end
 
 -- move by velocity, axis by axis.
--- sets wall/gnd/roof contacts
+-- sets wall/gnd contacts
 function pmove()
- wall,gnd,roof=nil
+ wall,gnd=nil
  px+=vx*dt
  local b=phit()
  if b and vx~=0 and not stepup(b) then
@@ -68,7 +68,7 @@ function pmove()
     if px-r<o[4] and px+r>o[1] and pz-r<o[6] and pz+r>o[3] and o[5]==py and not narrow(o) then gnd=o end
    end
   else
-   py,roof=b[2]-ph,b
+   py=b[2]-ph
   end
   vy=0
  end

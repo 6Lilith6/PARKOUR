@@ -50,6 +50,19 @@ SFX = [
 ]
 
 
+def music_sfx():
+    """Ambient running loop: two bass patterns + a beat."""
+    def seq(pitches, wave, vol):
+        return [(p, wave, vol if p else 0, 0) for p in pitches]
+    bass1 = [21, 0, 0, 21, 0, 0, 21, 0, 24, 0, 0, 24, 0, 0, 28, 0,
+             17, 0, 0, 17, 0, 0, 17, 0, 19, 0, 0, 19, 0, 0, 23, 0]
+    bass2 = [17, 0, 0, 17, 0, 0, 17, 0, 19, 0, 0, 19, 0, 0, 19, 0,
+             21, 0, 0, 21, 0, 0, 24, 0, 23, 0, 0, 23, 0, 0, 28, 0]
+    beat = [(24, 0, 4, 3) if i % 8 == 0 else (52, 6, 1, 5) if i % 2 == 0
+            else (0, 0, 0, 0) for i in range(32)]
+    return {16: (14, seq(bass1, 1, 3)), 17: (14, beat), 18: (14, seq(bass2, 1, 3))}
+
+
 def sfx_lines():
     lines = []
     for speed, notes in SFX:
@@ -63,7 +76,20 @@ def sfx_lines():
         lines.append(s)
     while len(lines) < 64:
         lines.append("00" + "10" + "0000" + "0" * 160)
+    for i, (speed, notes) in music_sfx().items():
+        lines[i] = "00%02x0000" % speed + "".join("%02x%x%x%x" % n for n in notes)
     return lines
+
+
+# patterns: (flags, [ch0..ch3]) flags 1=loop start 2=loop end; 0x40=off
+MUSIC = [(1, [16, 17, 0x40, 0x40]), (2, [18, 17, 0x40, 0x40])]
+
+
+def music_lines():
+    out = ["%02x %s" % (fl, "".join("%02x" % c for c in ch)) for fl, ch in MUSIC]
+    while len(out) < 64:
+        out.append("00 40404040")
+    return out
 
 
 def build(out_path=None):
@@ -76,7 +102,12 @@ def build(out_path=None):
     mem = bytes(data) + bytes(0x1000 - len(data))
     map_lines = [mem[i:i + 128].hex() for i in range(0, 0x1000, 128)]
     p8 = ["pico-8 cartridge // http://www.pico-8.com", "version 42",
-          "__lua__", code, "__map__"] + map_lines + ["__sfx__"] + sfx_lines()
+          "__lua__", code, "__map__"] + map_lines + ["__sfx__"] + sfx_lines() + \
+        ["__music__"] + music_lines()
+    label = os.path.join(ROOT, "tools", "label.txt")
+    if os.path.exists(label):
+        with open(label) as f:
+            p8 += ["__label__"] + f.read().split()
     out_path = out_path or os.path.join(ROOT, "parkour.p8")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(p8) + "\n")

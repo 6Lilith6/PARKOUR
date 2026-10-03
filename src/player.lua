@@ -141,7 +141,7 @@ s.air=function()
  if not wall and jz and hs()>3.2 then
   for sd=-1,1,2 do
    local b=solid(px-sin(ang)*sd*.8,py+1,pz+cos(ang)*sd*.8)
-   if b and b~=lastwr then
+   if b and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
     wall=b
     if px>b[1] and px<b[4] then
      wnx,wnz=0,pz<b[3] and -1 or 1

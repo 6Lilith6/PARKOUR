@@ -106,6 +106,18 @@ function render()
  for b in all(o) do add(v,b) end
  dl=v
  beacon()
+ -- ghost of the best run
+ local i=flr(tm/4)*3
+ if ghost and ghost[i+3] and mode=="play" then
+  local a,c={tocam(ghost[i+1],ghost[i+2],ghost[i+3])},{tocam(ghost[i+1],ghost[i+2]+1.7,ghost[i+3])}
+  if a[3]>near and c[3]>near then
+   a,c=proj(a),proj(c)
+   fillp(0x5a5a)
+   rectfill(a[1]-1,c[2],a[1]+1,a[2],12)
+   circfill(c[1],c[2],2,12)
+   fillp()
+  end
+ end
  fxdraw()
 end
 
@@ -124,7 +136,7 @@ function drawbox(b)
     local q={}
     for k in all(faces[ax]) do add(q,cs[k+sd*(ax==3 and 4 or ax)]) end
     local c=ax==2 and sd==1 and m[1] or m[ax==1 and 2 or 3]
-    if fog==2 then c=6 elseif fog==1 then fillp(0x5a5a) c+=96 end
+    if fog==2 then c=13 elseif fog==1 then fillp(0x5a5a) c+=208 end
     cpoly(q,c)
     fillp()
     if ax~=2 and fog==0 then deco(b,m[5],q,c,ax) end
