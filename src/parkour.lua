@@ -27,7 +27,7 @@ end
 
 -- face box b from the side the
 -- player is outside of
-function snapface(b,zf)
+function snapface(b,zf,keep)
  if zf==nil then zf=max(b[1]-px,px-b[4])<=max(b[3]-pz,pz-b[6]) end
  if not zf then
   wnx,wnz=px<b[1] and -1 or 1,0
@@ -36,7 +36,7 @@ function snapface(b,zf)
   wnx,wnz=0,pz<b[3] and -1 or 1
   pz=wnz<0 and b[3]-r or b[6]+r
  end
- ang,vx,vy,vz=atan2(-wnx,-wnz),0,0,0
+ if not keep then ang,vx,vy,vz=atan2(-wnx,-wnz),0,0,0 end
 end
 
 -- move feedback: name, flow, sfx

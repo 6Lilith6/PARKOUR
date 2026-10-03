@@ -29,6 +29,11 @@ if not PALETTE:
                (255, 0, 77), (255, 163, 0), (255, 236, 39), (0, 228, 54),
                (41, 173, 255), (131, 118, 156), (255, 119, 168), (255, 204, 170)]
 
+SECRET = [(41, 24, 20), (17, 29, 53), (66, 33, 54), (18, 83, 89), (116, 47, 41),
+          (73, 51, 59), (162, 136, 121), (243, 239, 125), (190, 18, 80), (255, 108, 36),
+          (168, 231, 46), (0, 181, 67), (6, 90, 181), (117, 70, 101), (255, 110, 89),
+          (255, 157, 129)]
+
 BUTTONS = {"left": 0, "right": 1, "up": 2, "down": 3, "z": 4, "x": 5}
 
 # ---------------------------------------------------------------- lua prep
@@ -231,7 +236,7 @@ function pget(x,y) return py.pget(x,y) end
 function print(s,x,y,c) py.print(tostring(s),x,y,c) end
 function fillp(p) py.fillp(p or 0) end
 function color(c) py.color(c) end
-function pal() end
+function pal(a,b,p) if p==1 then py.dpal(a,b) end end
 function palt() end
 function camera() end
 function clip() end
@@ -264,16 +269,16 @@ class Pico:
         self.instr = 0
         with open(cart, encoding="utf-8") as f:
             text = f.read()
-        lua_src = text.split("__lua__\n")[1].split("\n__map__")[0]
+        lua_src = re.split(r"\n__\w+__\n", text.split("__lua__\n")[1])[0]
         lua_src = lua_src.replace("-->8", "--")
-        maphex = text.split("__map__\n")[1].split("\n__sfx__")[0].replace("\n", "")
+        import p8mem
         self.mem = bytearray(0x8000)
-        data = bytes.fromhex(maphex)
-        self.mem[0x2000:0x2000 + len(data)] = data
+        self.mem[:0x4300] = p8mem.sections_to_rom(text)
+        self.dpal = list(range(16))
         self.L = lupa.LuaRuntime(unpack_returned_tuples=True)
         g = self.L.globals()
         api = self.L.table()
-        for name in ("btn", "btnp", "cls", "rectfill", "rect", "line", "circfill",
+        for name in ("dpal", "btn", "btnp", "cls", "rectfill", "rect", "line", "circfill",
                      "circ", "pset", "pget", "print", "fillp", "color", "sfx",
                      "peek", "peek2", "time", "printh"):
             api[name] = getattr(self, "api_" + name)
@@ -295,6 +300,13 @@ class Pico:
         g._init()
 
     # ------------------------------------------------------------- api
+    def api_dpal(self, i, c):
+        self.dpal[int(i)] = int(c)
+
+    def rgb(self, c):
+        d = self.dpal[c]
+        return SECRET[d - 128] if d >= 128 else PALETTE[d & 15]
+
     def api_btn(self, i=None):
         if i is None:
             return sum(1 << BUTTONS[b] for b in self.held)
@@ -448,9 +460,15 @@ class Pico:
         from PIL import Image
         self.g._draw()
         im = Image.new("RGB", (128, 128))
-        im.putdata([PALETTE[c] for c in self.fb])
+        im.putdata([self.rgb(c) for c in self.fb])
         im = im.resize((128 * scale, 128 * scale), Image.NEAREST)
         im.save(path)
+
+    def image(self, scale=1):
+        from PIL import Image
+        im = Image.new("RGB", (128, 128))
+        im.putdata([self.rgb(c) for c in self.fb])
+        return im.resize((128 * scale, 128 * scale), Image.NEAREST)
 
     def teleport(self, x, y, z, ang=None):
         self.L.execute("px,py,pz=%f,%f,%f vx,vy,vz,spd=0,0,0,0 setst'ground' nearupd()" % (x, y, z))

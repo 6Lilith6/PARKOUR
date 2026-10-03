@@ -113,10 +113,11 @@ function balance()
  balv=balv*.97+((rnd(2)-1)*(1+spd*.8)+bal*2.5-turn*5)*dt
  bal+=balv*dt
  -- drift sideways with the lean
- px-=sin(ang)*bal*.4*dt
- pz+=cos(ang)*bal*.4*dt
+ local lx,lz=-sin(ang)*bal,cos(ang)*bal
+ px+=lx*.4*dt
+ pz+=lz*.4*dt
  if abs(bal)>1 then
-  vx,vy,vz=-sin(ang)*bal*2,1,cos(ang)*bal*2
+  vx,vy,vz=lx*2,1,lz*2
   bal,balv=0,0
   brk("slipped",11)
   toair()
@@ -148,13 +149,7 @@ s.air=function()
    local b=solid(px-sin(ang)*sd*.8,py+1,pz+cos(ang)*sd*.8)
    if b and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
     wall=b
-    if px>b[1] and px<b[4] then
-     wnx,wnz=0,pz<b[3] and -1 or 1
-     pz=wnz<0 and b[3]-r or b[6]+r
-    else
-     wnx,wnz=px<b[1] and -1 or 1,0
-     px=wnx<0 and b[1]-r or b[4]+r
-    end
+    snapface(b,px>b[1] and px<b[4],1)
    end
   end
  end
@@ -188,7 +183,6 @@ function land()
  local h,hv=peak-py,hs()
  if hv>.5 then ang=atan2(vx,vz) end
  spd,gb,coy,wupd,kicks,lastwr=hv,gnd,0,false,0
- puff(4)
  -- awning: bounce up
  if gb.f&4>0 then
   toair()
@@ -339,8 +333,8 @@ end
 
 s.pull=function()
  local k=min(stt/pdur,1)
- local ky,kf=min(k*1.6,1),max(k*2-1)
- px,py,pz=pa[1]+(pb[1]-pa[1])*kf,pa[2]+(pb[2]-pa[2])*ky,pa[3]+(pb[3]-pa[3])*kf
+ local a=lerp3(pa,pb,max(k*2-1))
+ px,py,pz=a[1],lerp3(pa,pb,min(k*1.6,1))[2],a[3]
  if k>=1 then
   spd,gb=hcat and iu and 4 or 1
   setst"ground"

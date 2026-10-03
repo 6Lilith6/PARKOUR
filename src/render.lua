@@ -55,6 +55,7 @@ end
 faces={split"0,2,6,4",split"0,1,5,4",split"0,2,3,1"}
 ubx=split"-999,-999,999,999"
 fpat={0x3333,0x5555,0x7777,0x5a5a}
+dpat=split"0,0xf0f0,0,0x3333,0,0,0,0xa5a5"
 
 -- must a be drawn before b?
 -- every separating plane must have
@@ -89,7 +90,7 @@ function render()
  -- boxes in range and in front
  -- get camera-space corners and
  -- screen bounds
- local v,o,out={},{},{}
+ local v={}
  for b in all(dl) do
   local d,e,f,bx=0,0,0
   for i=1,3 do
@@ -99,7 +100,7 @@ function render()
    f+=(m-c)*cfw[i]
   end
   b.d,b.e=d,e
-  if e<50 and f>-b.rad then
+  if e<sk[8]+24 and f>-b.rad then
    bx,b.cs=split"999,999,-999,-999",{}
    b.bx=bx
    for i=0,7 do
@@ -111,7 +112,7 @@ function render()
    end
   end
   -- on screen?
-  add(e<50 and f>-b.rad and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 and v or o,b)
+  if e<sk[8]+24 and f>-b.rad and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 then add(v,b) end
  end
  -- painter's order: topological
  -- sort over screen-overlapping
@@ -126,71 +127,65 @@ function render()
     local p=a.bx
     if p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
    end
-   add(out,b)
    if b==plb then drawplayer() else drawbox(b) end
   end
  end
  for b in all(v) do visit(b) end
- for b in all(o) do add(out,b) end
- dl=out
  beacon()
- -- ghost of the best run
- local i=flr(tm/4)*3
- if ghost and ghost[i+3] and mode=="play" then
-  local a,c={tocam(ghost[i+1],ghost[i+2],ghost[i+3])},{tocam(ghost[i+1],ghost[i+2]+1.7,ghost[i+3])}
-  if a[3]>near and c[3]>near then
-   a,c=proj(a),proj(c)
-   fillp(0x5a5a)
-   rectfill(a[1]-1,c[2],a[1]+1,a[2],12)
-   circfill(c[1],c[2],2,12)
-   fillp()
-  end
- end
  fxdraw()
 end
 
 function drawbox(b)
  local m,cs=mats[b.m],b.cs
- local fog=b.e>40 and 2 or b.e>26 and 1 or 0
+ local fog=b.e>sk[8]+14 and 2 or b.e>sk[8] and 1 or 0
  for ax=1,3 do
   for sd=0,1 do
    if sd==0 and cpos[ax]<b[ax] or sd==1 and cpos[ax]>b[ax+3] then
     local q={}
     for k in all(faces[ax]) do add(q,cs[k+sd*(ax==3 and 4 or ax)]) end
     local c=ax==2 and sd==1 and m[1] or m[ax==1 and 2 or 3]
-    if fog==2 then c=13 elseif fog==1 then fillp(0x5a5a) c+=208 end
+    if fog==2 then c=sk[7] elseif fog==1 then fillp(0x5a5a) c+=sk[7]*16 end
     cpoly(q,c)
     fillp()
     -- details only with cpu to spare
-    if ax~=2 and fog==0 and stat(1)<.9 then deco(b,m[5],q,c,ax) end
+    if ax~=2 and fog==0 and stat(1)<.9 then deco(b,m[5],q,c) end
    end
   end
  end
 end
 
--- surface details on vertical faces
-function deco(b,dk,q,c,ax)
- local h=b[5]-b[2]
- if dk==1 and h>3 then
-  -- window bands
+-- surface details on vertical
+-- faces. deco: lo=type hi=colour
+-- 1 window bands 3 poster 5 vent
+-- 6 neon outline 7 cross brace
+-- 2/4/8 full pattern (rungs,
+-- stripes, rough stone/grime)
+function deco(b,dk,q,c)
+ local h,t,k=b[5]-b[2],dk%16,dk\16
+ if t==1 and h>3 then
   fillp(fpat[flr(b[1]+b[3])%3+1])
   for y=1.4,h-1.2,3 do
-   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+(c==1 and 192 or 16))
+   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+k*16)
   end
- elseif dk==2 then
-  -- ladder rungs
-  fillp(0xf0f0)
-  cpoly(q,10)
- elseif dk==3 and h>1.5 then
-  -- billboard poster
+ elseif t==3 and h>1.5 then
   fillp(fpat[b.k%4+1])
   cpoly({fp(q,.08,.15),fp(q,.08,.85),fp(q,.92,.85),fp(q,.92,.15)},({0xa9,0x7c,0xeb,0xb3})[b.k%4+1])
- elseif dk==4 then
-  fillp(0x3333)
-  cpoly(q,0x78)
- elseif dk==5 then
+ elseif t==5 then
   fillp(0x0f0f)
-  cpoly({fp(q,.2,.25),fp(q,.2,.75),fp(q,.8,.75),fp(q,.8,.25)},0x5d)
+  cpoly({fp(q,.2,.25),fp(q,.2,.75),fp(q,.8,.75),fp(q,.8,.25)},c+k*16)
+ elseif t==6 or t==7 then
+  local s={}
+  for v in all(q) do
+   if v[3]<near then return end
+   add(s,proj(v))
+  end
+  for i=1,t==6 and 4 or 2 do
+   local a,e=s[i],s[t==6 and i%4+1 or i+2]
+   line(a[1],a[2],e[1],e[2],k)
+  end
+ elseif t>0 then
+  fillp(dpat[t])
+  cpoly(q,c+k*16)
  end
  fillp()
 end
@@ -198,22 +193,20 @@ end
 -- sky gradient, sun, skyline
 function sky()
  local hy=mid(-20,64+fl*csp/ccp,150)
- cls(12)
+ cls(sk[1])
  fillp(0x5a5a)
- rectfill(0,hy-34,127,hy-18,0xc6)
+ rectfill(0,hy-34,127,hy-18,sk[1]+sk[2]*16)
  fillp()
- rectfill(0,hy-18,127,hy,6)
+ rectfill(0,hy-18,127,hy,sk[2])
  local yaw=atan2(ccy,csy)
- local sx=64-angd(.1-yaw)*fl*6
- circfill(sx,hy-30,7,7)
- -- distant city silhouettes
+ if sk[6]>0 then circfill(64-angd(.1-yaw)*fl*6,hy-30,7,sk[6]) end
+ -- distant silhouettes
  for i=0,47 do
-  local x=64-angd(i/48-yaw)*fl*6
-  local hh=(i*37%11+3)*fl/30
-  rectfill(x-6,hy-hh,x+6,hy,i%3==0 and 13 or 5+(i%2)*8)
+  local x,hh=64-angd(i/48-yaw)*fl*6,(i*37%11+3)*fl*sk[11]/240
+  rectfill(x-6,hy-hh,x+6,hy,i%3==0 and sk[3] or sk[4])
  end
- rectfill(0,hy,127,127,5)
- rectfill(0,hy,127,hy+2,13)
+ rectfill(0,hy,127,127,sk[5])
+ rectfill(0,hy,127,hy+2,sk[7])
 end
 
 -- next checkpoint marker (seen
@@ -221,13 +214,10 @@ end
 function beacon()
  for b in all(trig) do
   if b.m==12 or b.m==11 and b.k==cpi+1 then
-   local x,z=(b[1]+b[4])/2,(b[3]+b[6])/2
-   local a,c={tocam(x,b[2],z)},{tocam(x,b[2]+5,z)}
-   if a[3]>near and c[3]>near then
-    a,c=proj(a),proj(c)
-    local col=b.m==12 and 10 or 11
-    line(a[1],a[2],c[1],c[2],col)
-    circfill(c[1],c[2],1+t()*4%2,col)
+   local c={tocam((b[1]+b[4])/2,b[2]+4,(b[3]+b[6])/2)}
+   if c[3]>near then
+    c=proj(c)
+    circfill(c[1],c[2],1+t()*4%2,b.m-1)
    end
   end
  end
