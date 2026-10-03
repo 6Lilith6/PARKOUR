@@ -1,0 +1,27 @@
+"""Level 6 (neon district) route checks."""
+N, E, S, W = .75, 0, .25, .5
+SCENARIOS = {
+    "launch_letters": ((6, 24, -3, N), [(900, "up+ax+ej+rl")],
+                       lambda s, tr: s["y"] == 20 and s["z"] > 100 and "speed vault" in tr["pops"]),
+    "sign_bridge": ((0, 24, 26, N), [(200, "up")], lambda s, tr: s["y"] == 22 and s["z"] > 40),
+    "alley_wallrun": ((11.4, 22, 50, N), [(1, "flow=1"), (1, "spd=8.5"), (135, "up"), (1, "up+z"), (80, "up+z"), (80, "up+rl")],
+                      lambda s, tr: "wallrun" in tr["pops"] and s["y"] == 20 and s["z"] > 90),
+    "alley_beam": ((.25, 22, 64, N), [(350, "up+bal")], lambda s, tr: s["y"] <= 20.75 and s["z"] > 86),
+    "kiosk_bounce": ((10, 20, 88, N), [(200, "up+az")],
+                     lambda s, tr: "bounce" in tr["pops"] and tr.get("gy", 0) >= 23),
+    "big_gap_run": ((6, 20, 100, N), [(1, "flow=1"), (1, "spd=8.5"), (300, "up+ej+rl")],
+                    lambda s, tr: s["y"] == 19 and s["z"] > 145),
+    "big_gap_high": ((10, 23, 104, N), [(1, "flow=.6"), (400, "up+ej+rl")],
+                     lambda s, tr: "roll" in tr["pops"] and s["y"] < 21 and s["z"] > 145),
+    "hanging_signs": ((-2, 20, 124, N), [(300, "up+ej")], lambda s, tr: s["y"] == 19 and s["z"] > 142),
+    "rail_deck": ((5.5, 19, 146, N), [(1, "flow=.6"), (500, "up+ax+ej+rl")],
+                  lambda s, tr: tr.get("gy", 0) >= 16 and s["z"] > 190 and "slide" in tr["pops"]),
+    "train_roof_leap": ((2, 19, 146, N), [(1, "flow=.8"), (500, "up+ej")],
+                        lambda s, tr: tr["mode"] == "done"),
+    "train_wallrun": ((4.5, 16, 166, N), [(1, "flow=.8"), (1, "spd=8"), (20, "up"), (1, "up+z+right"), (60, "up+z+right"), (60, "up")],
+                      lambda s, tr: "wallrun" in tr["pops"]),
+    "sign_runup": ((6, 16, 188, N), [(1, "flow=.5"), (40, "up"), (1, "up+z"), (60, "up+z"), (40, "up"), (1, "up+z"), (80, "up+z"), (60, "up")],
+                   lambda s, tr: tr["mode"] == "done"),
+    "ladders": ((5.75, 16, 193, N), [(250, "up"), (1, "px=4.75 pz=198.5"), (250, "up")],
+                lambda s, tr: tr["mode"] == "done"),
+}

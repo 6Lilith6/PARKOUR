@@ -97,6 +97,9 @@ def run(name, verbose=False, shots=False):
             if "ej" in b:             # jump where the floor ends
                 b.remove("ej")
                 if pc.g.st == "ground" and not pc.L.eval("solid(px+cos(ang)*.7,py-.1,pz+sin(ang)*.7)"): b.append("z")
+            if "rl" in b:             # tap roll while falling
+                b.remove("rl")
+                if pc.g.st == "air" and pc.g.vy < -3 and f % 2 == 0: b.append("x")
             if "ax" in b:             # slide when a low bar is just ahead
                 b.remove("ax")
                 if pc.g.st in ("ground", "slide") and pc.L.eval(
