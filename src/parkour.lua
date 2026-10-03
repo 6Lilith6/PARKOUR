@@ -102,8 +102,8 @@ function airgrab()
    return true
   end
   if vy<2.5 then
-   snapface(b)
    hb,hcat=b,hs()>3
+   snapface(b)
    py=b[5]-(hcat and 1.5 or 2.05)
    setst"hang"
    trick(hcat and "cat leap" or "ledge grab",hcat and .1 or 0,4)

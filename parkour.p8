@@ -368,8 +368,8 @@ function airgrab()
    return true
   end
   if vy<2.5 then
-   snapface(b)
    hb,hcat=b,hs()>3
+   snapface(b)
    py=b[5]-(hcat and 1.5 or 2.05)
    setst"hang"
    trick(hcat and "cat leap" or "ledge grab",hcat and .1 or 0,4)
@@ -455,6 +455,7 @@ s.ground=function()
  if heavy>0 then heavy-=dt vmax=2.5 end
  -- crouch: x held slow, or
  -- no headroom
+ ph=1.8
  crouch=xx and spd<3.5 or phit()
  if crouch then ph,vmax=1,1.6 end
  if iu then
@@ -599,7 +600,8 @@ function land()
  puff(4)
  -- awning: bounce up
  if gb.f&4>0 then
-  vy,peak=jz and 12.5 or 11,py
+  toair()
+  vy=jz and 12.5 or 11
   trick("bounce",.1,10)
   return
  end
