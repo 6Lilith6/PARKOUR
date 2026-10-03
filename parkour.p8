@@ -1045,34 +1045,45 @@ end
 -- corner order per axis so that
 -- 1-2 and 4-3 are vertical edges
 faces={split"0,2,6,4",split"0,1,5,4",split"0,2,3,1"}
+ubx=split"-999,-999,999,999"
 fpat={0x3333,0x5555,0x7777,0x5a5a}
 
--- a should be drawn before b?
+-- must a be drawn before b?
+-- every separating plane must have
+-- the camera on the same side (if
+-- not, or the camera is between
+-- them, they can't overlap: no
+-- constraint). intersecting boxes
+-- fall back to distance
 function behind(a,b)
+ local r
  for i=1,3 do
-  local c=cpos[i]
+  local c,s=cpos[i]
   if a[i+3]<=b[i] then
-   if c>=b[i] then return true end
-   if c<=a[i+3] then return false end
+   s=c>=b[i] and 1 or c<=a[i+3] and 0 or 2
   elseif b[i+3]<=a[i] then
-   if c<=b[i+3] then return true end
-   if c>=a[i] then return false end
+   s=c<=b[i+3] and 1 or c>=a[i] and 0 or 2
+  end
+  if s then
+   if s==2 or r and r~=s then r=2 break end
+   r=s
   end
  end
- return a.d>b.d
+ return r==1 or not r and a.d>b.d
 end
 
 function render()
  sky()
  -- player pseudo-box joins sort
  plb[1],plb[2],plb[3],plb[4],plb[5],plb[6]=px-r,py,pz-r,px+r,py+ph,pz+r
- -- d: centre distance (sort tie
+ -- d: centre distance (tie
  -- break), e: gap distance (fog).
- -- only boxes in range and not
- -- behind the camera get sorted
- local v,o={},{}
+ -- boxes in range and in front
+ -- get camera-space corners and
+ -- screen bounds
+ local v,o,out={},{},{}
  for b in all(dl) do
-  local d,e,f=0,0,0
+  local d,e,f,bx=0,0,0
   for i=1,3 do
    local c,m=cpos[i],(b[i]+b[i+3])/2
    d+=abs(m-c)
@@ -1080,23 +1091,40 @@ function render()
    f+=(m-c)*cfw[i]
   end
   b.d,b.e=d,e
-  add(e<50 and f>-b.rad and v or o,b)
- end
- -- insertion sort: list stays
- -- nearly sorted frame to frame
- for i=2,#v do
-  local b,j=v[i],i-1
-  while j>0 and behind(b,v[j]) do
-   v[j+1]=v[j]
-   j-=1
+  if e<50 and f>-b.rad then
+   bx,b.cs=split"999,999,-999,-999",{}
+   b.bx=bx
+   for i=0,7 do
+    local c={tocam(b[1+i%2*3],b[2+flr(i/2)%2*3],b[3+flr(i/4)*3])}
+    b.cs[i]=c
+    -- corner behind us: unbounded
+    local s=c[3]>near and proj(c) or ubx
+    bx[1],bx[2],bx[3],bx[4]=min(bx[1],s[1]),min(bx[2],s[2]),max(bx[3],s[3] or s[1]),max(bx[4],s[4] or s[2])
+   end
   end
-  v[j+1]=b
+  -- on screen?
+  add(e<50 and f>-b.rad and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 and v or o,b)
  end
- for b in all(v) do
-  if b==plb then drawplayer() else drawbox(b) end
+ -- painter's order: topological
+ -- sort over screen-overlapping
+ -- pairs (dfs, back to front)
+ fr=(fr or 0)+1
+ local function visit(b)
+  if b.mk~=fr then
+   b.mk=fr
+   local x0,y0,x1,y1=unpack(b.bx)
+   for i=1,#v do
+    local a=v[i]
+    local p=a.bx
+    if p[1]<x1 and p[3]>x0 and p[2]<y1 and p[4]>y0 and behind(a,b) then visit(a) end
+   end
+   add(out,b)
+   if b==plb then drawplayer() else drawbox(b) end
+  end
  end
- for b in all(o) do add(v,b) end
- dl=v
+ for b in all(v) do visit(b) end
+ for b in all(o) do add(out,b) end
+ dl=out
  beacon()
  -- ghost of the best run
  local i=flr(tm/4)*3
@@ -1114,13 +1142,7 @@ function render()
 end
 
 function drawbox(b)
- local m,cs,vis=mats[b.m],{},0
- for i=0,7 do
-  local c={tocam(b[1+i%2*3],b[2+flr(i/2)%2*3],b[3+flr(i/4)*3])}
-  if c[3]>near then vis+=1 end
-  cs[i]=c
- end
- if vis==0 then return end
+ local m,cs=mats[b.m],b.cs
  local fog=b.e>40 and 2 or b.e>26 and 1 or 0
  for ax=1,3 do
   for sd=0,1 do
