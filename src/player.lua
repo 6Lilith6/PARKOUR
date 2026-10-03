@@ -82,21 +82,25 @@ s.ground=function()
  lstep=f
  if wall then
   local into=-cos(ang)*wnx-sin(ang)*wnz
-  if wall.f&2>0 and iu then
-   snapface(wall)
-   cb=wall
-   setst"climb"
-   sfx(4)
+  if wall.f&2>0 and iu and into>.5 then
+   startclimb()
   elseif into>.5 and spd>1 and canvault(wall) then
    startvault(wall)
   elseif into>.6 and jz and spd>3 then
    wallup(spd*into)
-  elseif into>.7 and spd>5.5 then
-   bonk()
-   stun=.3
-   setst"land"
-  else
-   spd*=1-into*.3
+  elseif into>.7 then
+   if spd>5.5 then
+    bonk()
+    stun=.3
+    setst"land"
+   end
+   spd=0
+  elseif into>0 then
+   -- glancing: slide along it
+   local tx,tz=-wnz,wnx
+   if cos(ang)*tx+sin(ang)*tz<0 then tx,tz=-tx,-tz end
+   ang=atan2(tx,tz)
+   spd*=1-into*.5
   end
  end
 end
@@ -155,7 +159,10 @@ s.air=function()
  end
  if not wall then return end
  local vin,vp=max(-vx*wnx-vz*wnz),vz*wnx-vx*wnz
- if jbuf>0 then
+ if wall.f&2>0 and iu and vin>.5 then
+  -- catch a ladder/pipe mid-air
+  startclimb()
+ elseif jbuf>0 then
   -- tic-tac: kick off, keep
   -- the along-wall speed
   wallkick(vp,max(3.2,vin*.5),"tic-tac")
@@ -338,7 +345,17 @@ s.pull=function()
  end
 end
 
--- ladders + drainpipes (yellow)
+-- ladders + drainpipes (yellow):
+-- always face their broad side
+function startclimb()
+ cb=wall
+ local zf=cb[4]-cb[1]>cb[6]-cb[3]
+ snapface(cb,zf)
+ if zf then px=mid(cb[1],px,cb[4]) else pz=mid(cb[3],pz,cb[6]) end
+ setst"climb"
+ sfx(4)
+end
+
 s.climb=function()
  local d=(iu and 1 or 0)-(id and 1 or 0)
  py+=d*2.6*dt

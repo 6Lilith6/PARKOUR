@@ -108,8 +108,9 @@ function _draw()
   pr("\^w\^tparkour",36,7,36)
   pr("rooftops",50,9)
   pr("press 🅾️ to start",64,7)
-  pr("⬅️➡️ steer  ⬆️ run  ⬇️ brake",96,6)
-  pr("🅾️ jump/wall  ❎ slide/roll/drop",104,6)
+  pr("⬅️➡️ steer  ⬆️ run  ⬇️ brake",92,6,6)
+  pr("🅾️ jump, hold on walls",100,6,6)
+  pr("❎ slide / roll / drop",108,6,6)
   if dget(20)>0 then pr("best "..ft(dget(0)),116,10) end
   return
  end
@@ -128,10 +129,8 @@ function _draw()
   pr(pop..(chain>1 and " x"..chain or ""),108-popt*4,popt>.3 and 7 or 6)
  end
  if hint then
-  local s,w=hints[hint],0
-  for l in all(split(s,"\n")) do w=max(w,#l) end
-  rectfill(62-w*2,97,66+w*2,117,1)
-  print(s,64-w*2,99,7)
+  rectfill(2,97,125,117,1)
+  print(hints[hint],4,99,7)
  end
  if fade>0 then
   fillp(fade>6 and 0 or 0x5a5a)
@@ -294,8 +293,9 @@ end
 
 -- face box b from the side the
 -- player is outside of
-function snapface(b)
- if max(b[1]-px,px-b[4])>max(b[3]-pz,pz-b[6]) then
+function snapface(b,zf)
+ if zf==nil then zf=max(b[1]-px,px-b[4])<=max(b[3]-pz,pz-b[6]) end
+ if not zf then
   wnx,wnz=px<b[1] and -1 or 1,0
   px=wnx<0 and b[1]-r or b[4]+r
  else
@@ -491,21 +491,25 @@ s.ground=function()
  lstep=f
  if wall then
   local into=-cos(ang)*wnx-sin(ang)*wnz
-  if wall.f&2>0 and iu then
-   snapface(wall)
-   cb=wall
-   setst"climb"
-   sfx(4)
+  if wall.f&2>0 and iu and into>.5 then
+   startclimb()
   elseif into>.5 and spd>1 and canvault(wall) then
    startvault(wall)
   elseif into>.6 and jz and spd>3 then
    wallup(spd*into)
-  elseif into>.7 and spd>5.5 then
-   bonk()
-   stun=.3
-   setst"land"
-  else
-   spd*=1-into*.3
+  elseif into>.7 then
+   if spd>5.5 then
+    bonk()
+    stun=.3
+    setst"land"
+   end
+   spd=0
+  elseif into>0 then
+   -- glancing: slide along it
+   local tx,tz=-wnz,wnx
+   if cos(ang)*tx+sin(ang)*tz<0 then tx,tz=-tx,-tz end
+   ang=atan2(tx,tz)
+   spd*=1-into*.5
   end
  end
 end
@@ -564,7 +568,10 @@ s.air=function()
  end
  if not wall then return end
  local vin,vp=max(-vx*wnx-vz*wnz),vz*wnx-vx*wnz
- if jbuf>0 then
+ if wall.f&2>0 and iu and vin>.5 then
+  -- catch a ladder/pipe mid-air
+  startclimb()
+ elseif jbuf>0 then
   -- tic-tac: kick off, keep
   -- the along-wall speed
   wallkick(vp,max(3.2,vin*.5),"tic-tac")
@@ -747,7 +754,17 @@ s.pull=function()
  end
 end
 
--- ladders + drainpipes (yellow)
+-- ladders + drainpipes (yellow):
+-- always face their broad side
+function startclimb()
+ cb=wall
+ local zf=cb[4]-cb[1]>cb[6]-cb[3]
+ snapface(cb,zf)
+ if zf then px=mid(cb[1],px,cb[4]) else pz=mid(cb[3],pz,cb[6]) end
+ setst"climb"
+ sfx(4)
+end
+
 s.climb=function()
  local d=(iu and 1 or 0)-(id and 1 or 0)
  py+=d*2.6*dt
@@ -937,6 +954,8 @@ function camupd()
   if solid(tx+(dx-tx)*k,ty+(dy-ty)*k,tz+(dz-tz)*k) then
    k-=.15
    dx,dy,dz=tx+(dx-tx)*k,ty+(dy-ty)*k,tz+(dz-tz)*k
+   -- too close: lift over the head
+   if k<.4 then dx,dy,dz=tx-fx*.3,ty+1.6,tz-fz*.3 end
    break
   end
  end
@@ -945,9 +964,9 @@ function camupd()
  cam[3]+=(dz-cam[3])*.2
  cam[2]+=ey*min(.3,.07+abs(ey)*.04)
  -- look ahead along the run
- look[1]+=(tx+cos(ang)*h*.3-look[1])*.2
+ look[1]+=(tx+cos(ang)*(1+h*.3)-look[1])*.2
  look[2]+=(ty-.2-look[2])*.15
- look[3]+=(tz+sin(ang)*h*.3-look[3])*.2
+ look[3]+=(tz+sin(ang)*(1+h*.3)-look[3])*.2
  fl+=(72-h*1.7-fl)*.1
  shake=max(shake-dt)
  local sx,sy,sz=cam[1]+rnd(shake)-shake/2,cam[2]+rnd(shake),cam[3]

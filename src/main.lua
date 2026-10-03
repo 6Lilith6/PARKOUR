@@ -105,8 +105,9 @@ function _draw()
   pr("\^w\^tparkour",36,7,36)
   pr("rooftops",50,9)
   pr("press 🅾️ to start",64,7)
-  pr("⬅️➡️ steer  ⬆️ run  ⬇️ brake",96,6)
-  pr("🅾️ jump/wall  ❎ slide/roll/drop",104,6)
+  pr("⬅️➡️ steer  ⬆️ run  ⬇️ brake",92,6,6)
+  pr("🅾️ jump, hold on walls",100,6,6)
+  pr("❎ slide / roll / drop",108,6,6)
   if dget(20)>0 then pr("best "..ft(dget(0)),116,10) end
   return
  end
@@ -125,10 +126,8 @@ function _draw()
   pr(pop..(chain>1 and " x"..chain or ""),108-popt*4,popt>.3 and 7 or 6)
  end
  if hint then
-  local s,w=hints[hint],0
-  for l in all(split(s,"\n")) do w=max(w,#l) end
-  rectfill(62-w*2,97,66+w*2,117,1)
-  print(s,64-w*2,99,7)
+  rectfill(2,97,125,117,1)
+  print(hints[hint],4,99,7)
  end
  if fade>0 then
   fillp(fade>6 and 0 or 0x5a5a)

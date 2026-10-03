@@ -28,6 +28,8 @@ function camupd()
   if solid(tx+(dx-tx)*k,ty+(dy-ty)*k,tz+(dz-tz)*k) then
    k-=.15
    dx,dy,dz=tx+(dx-tx)*k,ty+(dy-ty)*k,tz+(dz-tz)*k
+   -- too close: lift over the head
+   if k<.4 then dx,dy,dz=tx-fx*.3,ty+1.6,tz-fz*.3 end
    break
   end
  end
@@ -36,9 +38,9 @@ function camupd()
  cam[3]+=(dz-cam[3])*.2
  cam[2]+=ey*min(.3,.07+abs(ey)*.04)
  -- look ahead along the run
- look[1]+=(tx+cos(ang)*h*.3-look[1])*.2
+ look[1]+=(tx+cos(ang)*(1+h*.3)-look[1])*.2
  look[2]+=(ty-.2-look[2])*.15
- look[3]+=(tz+sin(ang)*h*.3-look[3])*.2
+ look[3]+=(tz+sin(ang)*(1+h*.3)-look[3])*.2
  fl+=(72-h*1.7-fl)*.1
  shake=max(shake-dt)
  local sx,sy,sz=cam[1]+rnd(shake)-shake/2,cam[2]+rnd(shake),cam[3]

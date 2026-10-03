@@ -27,8 +27,9 @@ end
 
 -- face box b from the side the
 -- player is outside of
-function snapface(b)
- if max(b[1]-px,px-b[4])>max(b[3]-pz,pz-b[6]) then
+function snapface(b,zf)
+ if zf==nil then zf=max(b[1]-px,px-b[4])<=max(b[3]-pz,pz-b[6]) end
+ if not zf then
   wnx,wnz=px<b[1] and -1 or 1,0
   px=wnx<0 and b[1]-r or b[4]+r
  else
