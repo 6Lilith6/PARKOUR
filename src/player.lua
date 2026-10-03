@@ -145,8 +145,8 @@ s.air=function()
  -- holding z near a wall pulls
  -- you onto it (wallrun magnet)
  if not wall and jz and hs()>3.2 then
-  for sd=-1,1,2 do
-   local b=solid(px-sin(ang)*sd*.8,py+1,pz+cos(ang)*sd*.8)
+  for sd=-.8,.8,.4 do
+   local b=solid(px-sin(ang)*sd,py+1,pz+cos(ang)*sd)
    if b and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
     wall=b
     snapface(b,px>b[1] and px<b[4],1)
