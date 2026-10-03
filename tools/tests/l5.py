@@ -1,0 +1,26 @@
+"""Level 5 (downtown) route checks."""
+N, E, S, W = .75, 0, .25, .5
+SCENARIOS = {
+    "fire_escape": ((14.75, 2.25, 0, N), [(130, "up"), (1, "ang=0"), (40, ""), (1, "px=15 pz=6.75"), (200, "up")],
+                    lambda s, tr: tr.get("gy", 0) >= 11),
+    "taxi_van_awning": ((10.5, 2, 0, N), [(100, "up+az"), (85, "up+ej"), (14, "up+left"), (8, "up"), (300, "up+ej")],
+                        lambda s, tr: tr.get("gy", 0) >= 11 and "bounce" in tr["pops"]),
+    "west_awning": ((4, 2, -3, N), [(60, "up+az"), (50, "up"), (16, "up+right"), (150, "up+ej")],
+                    lambda s, tr: tr.get("gy", 0) >= 6.5 and "bounce" in tr["pops"]),
+    "west_upper_roof": ((-2, 6.5, 11, N), [(200, "up+az")], lambda s, tr: tr.get("gy", 0) >= 10.5),
+    "billboard_cable": ((-2, 10.5, 26, N), [(1, "flow=.5"), (300, "up+ax+ej")],
+                        lambda s, tr: "slide" in tr["pops"] and tr.get("gy", 0) >= 12.25),
+    "skybridge": ((19.75, 11, 38, N), [(250, "up")], lambda s, tr: tr.get("gy", 0) >= 14),
+    "canopy_runup": ((10, 11, 49.5, N), [(6, "up"), (1, "up+z"), (100, "up+z")], lambda s, tr: tr.get("gy", 0) >= 14),
+    "office_roof_garage": ((-6, 14, 53, N), [(1, "flow=.5"), (500, "up+ax+ej")],
+                           lambda s, tr: "slide" in tr["pops"] and s["y"] == 11 and s["z"] > 105),
+    "car_hops": ((14, 11, 78, N), [(1, "flow=.5"), (300, "up+ej")],
+                 lambda s, tr: tr.get("gy", 0) >= 12.25 and s["z"] > 102),
+    "tower_ladders": ((0.75, 11, 108, N), [(250, "up"), (1, "px=3.75 pz=114"), (250, "up"), (1, "px=7.75 pz=120"), (250, "up")],
+                      lambda s, tr: tr.get("gy", 0) >= 23),
+    "tower_gondolas": ((10, 11, 107, N), [(20, "up"), (1, "up+z"), (30, "up+z"), (30, "up"), (1, "up+z"), (40, "up+z"), (400, "up+az")],
+                       lambda s, tr: tr.get("gy", 0) >= 23),
+    "tower_runup": ((16, 11, 96, N), [(1, "flow=.5"), (144, "up"), (1, "up+z"), (80, "up+z"), (60, "up")],
+                    lambda s, tr: tr.get("gy", 0) >= 15 and "wall climb" in tr["pops"]),
+    "goal": ((10, 23, 124.5, N), [(100, "up")], lambda s, tr: tr["mode"] == "done"),
+}

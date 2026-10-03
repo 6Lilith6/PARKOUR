@@ -94,6 +94,9 @@ def run(name, verbose=False, shots=False):
             if "az" in b:             # jump again ~0.1s after landing
                 b.remove("az")
                 if pc.g.st == "ground" and pc.g.stt > .1 and pc.g.stt < .14: b.append("z")
+            if "ej" in b:             # jump where the floor ends
+                b.remove("ej")
+                if pc.g.st == "ground" and not pc.L.eval("solid(px+cos(ang)*.7,py-.1,pz+sin(ang)*.7)"): b.append("z")
             if "ax" in b:             # slide when a low bar is just ahead
                 b.remove("ax")
                 if pc.g.st in ("ground", "slide") and pc.L.eval(
