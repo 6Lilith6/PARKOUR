@@ -138,7 +138,7 @@ def build():
     box(70, 31.25, 25, 72, 31.5, 27, WOOD)           # hook pallet
     box(70.875, 31.5, 26.75, 71.125, 34, 27, TRIM)
     L.hint(66, 29, 18, 75.75, 30, 6)
-    box(56, 30.5, 21.75, 60, 34, 24.25, PROP)        # cab under the jib
+    box(56, 31, 21.75, 60, 34, 24.25, PROP)        # cab under the jib
     L.goal(60, 34.5, 22, 64, 24)
 
     # ---------- scenery ----------

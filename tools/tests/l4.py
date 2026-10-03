@@ -9,6 +9,6 @@ SCENARIOS = {
     "tunnel_zigzag": ((9.6, 4.25, 42, N), [(1, "flow=.8"), (1, "spd=8"), (10, "up"), (31, "up+z+right"), (30, "up+z"), (2, "up"), (1, "up+z"), (40, "up+z"), (2, "up"), (1, "up+z"), (50, "up+z"), (60, "up")], lambda s, tr: tr["pops"].count("wallrun") >= 2 and s["z"] > 62),
     "crate_chain": ((9.6, 4.25, 92, N), [(400, "up+az")], lambda s, tr: tr.get("gy", 0) >= 9),
     "landing_ladder": ((0.75, 2, 105, N), [(250, "up")], lambda s, tr: tr.get("gy", 0) >= 9),
-    "upper_tunnel": ((12.25, 9, 112, N), [(1, "flow=.5"), (700, "up+az+ax+bal")], lambda s, tr: s["z"] > 160),
+    "upper_tunnel": ((11.75, 9, 112, N), [(1, "flow=.5"), (700, "up+az+ax+bal")], lambda s, tr: s["z"] > 160),
     "exit_goal": ((11, 9, 168, N), [(400, "up+az")], lambda s, tr: tr["mode"] == "done"),
 }

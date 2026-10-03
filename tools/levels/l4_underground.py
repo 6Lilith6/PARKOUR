@@ -71,7 +71,7 @@ def build():
     box(13, 2, 41, 14, 8, 90, B)
     box(8, 8, 41, 14, 8.5, 90, B)
     for z0, z1 in ((41, 55), (58, 70), (73, 90)):
-        box(9, 3.25, z0, 10.25, 4.25, z1, BEAM)       # walkway
+        box(9, 2, z0, 10.25, 4.25, z1, BEAM)          # walkway
     box(11.5, 2, 48, 12.75, 3, 49, PROP)              # signal box
     box(10.25, 3, 60, 13, 3.5, 60.5, TRIM)            # pipe: slide
     box(9, 5.25, 64, 10.25, 5.5, 64.5, TRIM)          # cable: slide
@@ -94,7 +94,7 @@ def build():
     box(-6, 8.5, 111, 28, 9, 116, A)                  # upper landing
     box(-6, 2, 110.75, 28, 8.5, 111, B)               # its face
     box(0, 2, 110.5, 1.5, 9, 110.75, CLIMB)           # ladder (7m)
-    box(9, 3.25, 90, 10.25, 4.25, 100, BEAM)          # walkway goes on
+    box(9, 2, 90, 10.25, 4.25, 100, BEAM)             # walkway goes on
     box(9, 2, 100, 11.5, 5.5, 102.5, WOOD)            # crate chain
     box(9, 2, 103.5, 11.5, 6.75, 106, WOOD)
     box(9, 2, 107, 11.5, 8, 109.5, WOOD)
@@ -111,8 +111,8 @@ def build():
     # ---------- upper tunnel (z 117..166) at y9 ----------
     box(9, 8.5, 117, 13, 9, 130, A)
     box(9, 8.5, 133, 13, 9, 140, A)                   # pit z 130..133
-    box(9.5, 8.5, 140, 10, 9, 148, BEAM)              # beams over shaft
-    box(12, 8.5, 140, 12.5, 9, 148, BEAM)
+    box(10, 8.5, 140, 10.5, 9, 148, BEAM)             # beams over shaft
+    box(11.5, 8.5, 140, 12, 9, 148, BEAM)
     box(9, 8.5, 148, 13, 9, 166, A)
     box(8, 9, 117, 9, 13.5, 166, B)
     box(13, 9, 117, 14, 13.5, 166, B)

@@ -43,19 +43,23 @@ end
 
 -- move by velocity, axis by axis.
 -- sets wall/gnd contacts
+-- push out on the side the
+-- centre came from (also right
+-- if already overlapping)
 function pmove()
  wall,gnd=nil
+ local ox,oz=px,pz
  px+=vx*dt
  local b=phit()
  if b and vx~=0 and not stepup(b) then
-  px=vx>0 and b[1]-r-.001 or b[4]+r+.001
-  wall,wnx,wnz=b,-sgn(vx),0
+  wnx,wnz=ox<(b[1]+b[4])/2 and -1 or 1,0
+  px,wall=wnx<0 and b[1]-r-.001 or b[4]+r+.001,b
  end
  pz+=vz*dt
  b=phit()
  if b and vz~=0 and not stepup(b) then
-  pz=vz>0 and b[3]-r-.001 or b[6]+r+.001
-  wall,wnx,wnz=b,0,-sgn(vz)
+  wnx,wnz=0,oz<(b[3]+b[6])/2 and -1 or 1
+  pz,wall=wnz<0 and b[3]-r-.001 or b[6]+r+.001,b
  end
  py+=vy*dt
  b=phit()

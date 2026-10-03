@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Random-input robustness test: mashes buttons from many start points and
-checks for Lua errors, NaN positions, states that never end, and the
-runner ending up embedded in geometry.
+"""Random-input robustness test: mashes buttons from every checkpoint of
+every level and checks for Lua errors, NaN positions, states that never
+end, and the runner ending up embedded in geometry.
 
-    python3 tools/fuzz.py [seconds-per-run] [runs]
+    python3 tools/fuzz.py [seconds-per-run] [runs-per-level] [levels]
 """
 import math, os, random, sys
 
@@ -11,18 +11,34 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sim import Pico  # noqa: E402
 
 CART = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "parkour.p8")
-STARTS = [(10, 14, 2), (12, 12, 50), (14, 16, 80), (40, 15, 80), (60, 9, 90),
-          (56, 18, 110), (60, 17, 135), (50, 15, 165), (52, 16, 195)]
 TRANSIENT = {"vault": 1, "pull": 1, "roll": 1, "land": 1.5, "wallrun": 3, "wallup": 3}
 BTNS = ["up", "down", "left", "right", "z", "x"]
 
 
-def fuzz(seconds=20, runs=9, seed=1):
+def starts(lv):
+    """checkpoint centres of a level"""
+    pc = Pico(CART)
+    pc.L.execute("setlv(%d)" % lv)
+    return [tuple(c.values()) for c in pc.L.eval(
+        "(function() local t={} for b in all(trig) do if b.m==11 then add(t,{(b[1]+b[4])/2,b[2],(b[3]+b[6])/2}) end end return t end)()").values()]
+
+
+def fuzz(seconds=20, runs=9, levels=range(8), seed=1):
     rnd = random.Random(seed)
     problems = 0
+    for lv in levels:
+        sp = starts(lv)
+        problems += fuzz_level(lv, sp, seconds, runs, rnd, seed)
+    print("problems:", problems)
+    return problems
+
+
+def fuzz_level(lv, sp, seconds, runs, rnd, seed):
+    problems = 0
     for k in range(runs):
-        x, y, z = STARTS[k % len(STARTS)]
+        x, y, z = sp[k % len(sp)]
         pc = Pico(CART, seed=seed + k)
+        pc.L.execute("setlv(%d)" % lv)
         pc.g.mode = "play"
         pc.teleport(x, y, z, rnd.random())
         held, st_since, last_st = set(["up"]), 0, None
@@ -32,31 +48,31 @@ def fuzz(seconds=20, runs=9, seed=1):
             try:
                 pc.step(held, draw=(f % 97 == 0))
             except Exception as e:  # lua error
-                print("run %d frame %d: LUA ERROR %s" % (k, f, e))
+                print("L%d run %d frame %d: LUA ERROR %s" % (lv + 1, k, f, e))
                 problems += 1
                 break
             g = pc.g
             if any(math.isnan(v) or abs(v) > 1000 for v in (g.px, g.py, g.pz, g.vx, g.vy, g.vz)):
-                print("run %d frame %d: bad numbers %s" % (k, f, pc.state()))
+                print("L%d run %d frame %d: bad numbers %s" % (lv + 1, k, f, pc.state()))
                 problems += 1
                 break
             if g.st != last_st:
                 last_st, st_since = g.st, f
             elif g.st in TRANSIENT and (f - st_since) / 60 > TRANSIENT[g.st]:
-                print("run %d frame %d: stuck in %s %s" % (k, f, g.st, pc.state()))
+                print("L%d run %d frame %d: stuck in %s %s" % (lv + 1, k, f, g.st, pc.state()))
                 problems += 1
                 break
             if g.st in ("ground", "air", "slide", "roll") and pc.L.eval("phit()"):
                 b = pc.L.eval("phit()")
-                print("run %d frame %d: inside box %s %s" % (k, f, [b[i] for i in range(1, 7)], pc.state()))
+                print("L%d run %d frame %d: inside box %s %s" % (lv + 1, k, f, [b[i] for i in range(1, 7)], pc.state()))
                 problems += 1
                 break
         else:
-            print("run %d ok (%s)" % (k, pc.state()["st"]))
-    print("problems:", problems)
+            print("L%d run %d ok (%s)" % (lv + 1, k, pc.state()["st"]))
     return problems
 
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    sys.exit(1 if fuzz(float(a[0]) if a else 20, int(a[1]) if len(a) > 1 else 9) else 0)
+    lvs = [int(c) - 1 for c in a[2].split(",")] if len(a) > 2 else range(8)
+    sys.exit(1 if fuzz(float(a[0]) if a else 20, int(a[1]) if len(a) > 1 else 6, lvs) else 0)

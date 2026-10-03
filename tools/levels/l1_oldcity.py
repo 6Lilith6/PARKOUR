@@ -174,6 +174,14 @@ def build():
     L.box(48, 21.25, 208, 56, 24, 214, GOAL)
     L.box(56, 21, 214, 56.25, 27, 214.25, TRIM)     # mast
 
+    # ---------------- old-city details (off the routes) ----------------
+    for x, z, y in ((18.5, 31.5, 14), (2.5, 60.5, 12), (31, 91, 15), (64.5, 128, 18), (61.5, 147, 17)):
+        L.box(x, y, z, x + 1, y + 2.5, z + 1, ACCENT)  # chimney stacks
+    for x0, x1, y, z in ((-2, 2, 15.5, 44), (66, 74, 21.5, 112)):
+        L.box(x0, y, z, x1, y + .25, z + .25, TRIM)    # clotheslines
+        for xa, c in ((x0 + .5, 1), (x1 - 1.75, 2)):
+            L.box(xa, y - .75, z, xa + 1.25, y, z + .25, SIGN, c)  # laundry
+
     # ---------------- skyline (scenery) ----------------
     L.bldg(-14, 0, -4, 30, 22, DARK)
     L.bldg(-12, 36, -2, 70, 10, B)

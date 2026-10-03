@@ -145,9 +145,11 @@ s.air=function()
  -- holding z near a wall pulls
  -- you onto it (wallrun magnet)
  if not wall and jz and hs()>3.2 then
-  for sd=-.8,.8,.4 do
+  -- nearest probe first: a thin
+  -- wall hides what is behind it
+  for sd in all(split"0,.4,-.4,.8,-.8") do
    local b=solid(px-sin(ang)*sd,py+1,pz+cos(ang)*sd)
-   if b and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
+   if b and not wall and b~=lastwr and max(b[4]-b[1],b[6]-b[3])>2 then
     wall=b
     snapface(b,px>b[1] and px<b[4],1)
    end
@@ -236,7 +238,7 @@ s.roll=function()
  gvel()
  ph=.9
  if not gnd then toair() return end
- if jbuf>0 and stt>.2 then dojump() return end
+ if jbuf>0 and stt>.2 and not phit(py+.9) then dojump() return end
  if stt>.45 then setst"ground" end
 end
 
@@ -246,7 +248,8 @@ s.slide=function()
  ph=.8
  gvel()
  if not gnd then toair() return end
- if jbuf>0 then dojump() return end
+ -- jump only with headroom
+ if jbuf>0 and not phit(py+1) then dojump() return end
  if wall then spd*=.5 end
  if not xx and stt>.35 or spd<2.5 then
   ph=1.8
