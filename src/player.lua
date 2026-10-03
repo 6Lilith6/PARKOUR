@@ -141,7 +141,7 @@ s.air=function()
  if not wall and jz and hs()>3.2 then
   for sd=-1,1,2 do
    local b=solid(px-sin(ang)*sd*.8,py+1,pz+cos(ang)*sd*.8)
-   if b then
+   if b and b~=lastwr then
     wall=b
     if px>b[1] and px<b[4] then
      wnx,wnz=0,pz<b[3] and -1 or 1
@@ -161,10 +161,10 @@ s.air=function()
   wallkick(vp,max(3.2,vin*.5),"tic-tac")
  elseif jz and abs(vp)>3.2 and abs(vp)>vin*.7 and wall~=lastwr then
   -- wallrun
-  wrs,lastwr=abs(vp),wall
+  wrs,lastwr=max(abs(vp),hs()*.85),wall
   wrt=.5+wrs*.12
   wrmax=wrt
-  vy=max(vy,1+wrs*.3)
+  vy=mid(vy,1+wrs*.25,3.5)
   ang=atan2(-wnz*vp,wnx*vp)
   trick("wallrun",.1,5)
   setst"wallrun"
@@ -270,7 +270,7 @@ end
 
 s.wallrun=function()
  wrt-=dt
- vy-=g*(.12+(1-wrt/wrmax)*.7)*dt
+ vy-=g*(.05+(1-wrt/wrmax)*.55)*dt
  wrs=max(wrs-dt)
  vx,vz=cos(ang)*wrs-wnx,sin(ang)*wrs-wnz
  pmove()

@@ -9,7 +9,7 @@ end
 -- on top in front of us?
 function canvault(b)
  local h,x,z=b[5]-py,px+cos(ang)*.5,pz+sin(ang)*.5
- return h>.4 and h<1.4 and b.f&2==0 and not hit(x-r,b[5]+.02,z-r,x+r,b[5]+1.6,z+r)
+ return h>.5 and h<1.4 and b.f&2==0 and not hit(x-r,b[5]+.02,z-r,x+r,b[5]+1.6,z+r)
 end
 
 -- ledge in front of the hands,
@@ -120,7 +120,7 @@ end
 -- kick off a wall (tic-tac / wall
 -- jump): keep along-wall speed vp
 function wallkick(vp,out,n)
- vx,vy,vz=-wnz*vp+wnx*out,max(vy,6.6-kicks*1.3),wnx*vp+wnz*out
+ vx,vy,vz,jbuf=-wnz*vp+wnx*out,max(vy,6.6-kicks*1.3),wnx*vp+wnz*out,0
  kicks+=1
  ang=atan2(vx,vz)
  toair()

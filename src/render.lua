@@ -75,32 +75,36 @@ function render()
  -- player pseudo-box joins sort
  plb[1],plb[2],plb[3],plb[4],plb[5],plb[6]=px-r,py,pz-r,px+r,py+ph,pz+r
  -- d: centre distance (sort tie
- -- break), e: gap distance (fog)
+ -- break), e: gap distance (fog).
+ -- only boxes in range and not
+ -- behind the camera get sorted
+ local v,o={},{}
  for b in all(dl) do
-  b.d,b.e=0,0
+  local d,e,f=0,0,0
   for i=1,3 do
-   local c=cpos[i]
-   b.d+=abs((b[i]+b[i+3])/2-c)
-   b.e+=max(max(b[i]-c,c-b[i+3]))
+   local c,m=cpos[i],(b[i]+b[i+3])/2
+   d+=abs(m-c)
+   e+=max(max(b[i]-c,c-b[i+3]))
+   f+=(m-c)*cfw[i]
   end
+  b.d,b.e=d,e
+  add(e<50 and f>-b.rad and v or o,b)
  end
  -- insertion sort: list stays
  -- nearly sorted frame to frame
- for i=2,#dl do
-  local b,j=dl[i],i-1
-  while j>0 and behind(b,dl[j]) do
-   dl[j+1]=dl[j]
+ for i=2,#v do
+  local b,j=v[i],i-1
+  while j>0 and behind(b,v[j]) do
+   v[j+1]=v[j]
    j-=1
   end
-  dl[j+1]=b
+  v[j+1]=b
  end
- for b in all(dl) do
-  if b==plb then
-   drawplayer()
-  elseif b.e<50 then
-   drawbox(b)
-  end
+ for b in all(v) do
+  if b==plb then drawplayer() else drawbox(b) end
  end
+ for b in all(o) do add(v,b) end
+ dl=v
  beacon()
  fxdraw()
 end
@@ -136,7 +140,7 @@ function deco(b,dk,q,c,ax)
   -- window bands
   fillp(fpat[flr(b[1]+b[3])%3+1])
   for y=1.4,h-1.2,3 do
-   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+16)
+   cpoly({fp(q,.06,y/h),fp(q,.06,(y+1.3)/h),fp(q,.94,(y+1.3)/h),fp(q,.94,y/h)},c+(c==1 and 192 or 16))
   end
  elseif dk==2 then
   -- ladder rungs

@@ -35,7 +35,7 @@ end
 
 -- step onto low curbs/stairs
 function stepup(b)
- if st~="air" and st~="wallrun" and b[5]-py<.45 and not phit(b[5]+.01) then
+ if st~="air" and st~="wallrun" and b[5]-py<.55 and not phit(b[5]+.01) then
   py=b[5]+.01
   return true
  end

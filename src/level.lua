@@ -20,7 +20,7 @@ function loadlvl()
  for a=0x2002,0x2001+peek2(0x2000)*9,9 do
   local x,z,y,m=peek2(a)/8,peek2(a+2)/8,peek(a+4)/4,peek(a+8)
   local b={x,y,z,x+peek(a+5)/4,y+peek(a+6)/4,z+peek(a+7)/4,m=m%16,k=m\16}
-  b.f=mats[b.m][4]
+  b.f,b.rad=mats[b.m][4],(b[4]-x+b[5]-y+b[6]-z)/2
   if b.f&8>0 then
    add(trig,b)
    if b.m==11 and b.k==0 then spawn={x+1,y,z+1,.75} end
@@ -30,6 +30,6 @@ function loadlvl()
  end
  -- player pseudo-box, sorted
  -- with the world for drawing
- plb={}
+ plb={rad=1}
  add(dl,plb)
 end

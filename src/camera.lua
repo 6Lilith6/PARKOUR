@@ -46,6 +46,7 @@ function camupd()
  local lx,ly,lz=look[1]-sx,look[2]-sy,look[3]-sz
  local yaw,pit=atan2(lx,lz),atan2(sqrt(lx*lx+lz*lz),ly)
  ccy,csy,ccp,csp=cos(yaw),sin(yaw),cos(pit),sin(pit)
+ cfw={ccy*ccp,csp,csy*ccp}
 end
 
 -- world -> camera space
