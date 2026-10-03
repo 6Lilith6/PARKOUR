@@ -1155,7 +1155,8 @@ function drawbox(b)
     if fog==2 then c=13 elseif fog==1 then fillp(0x5a5a) c+=208 end
     cpoly(q,c)
     fillp()
-    if ax~=2 and fog==0 then deco(b,m[5],q,c,ax) end
+    -- details only with cpu to spare
+    if ax~=2 and fog==0 and stat(1)<.9 then deco(b,m[5],q,c,ax) end
    end
   end
  end

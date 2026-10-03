@@ -5,6 +5,10 @@
 
 ![cart](parkour.p8.png)
 
+![expert run](docs/expert_run.gif)
+
+*Экспертный маршрут целиком (автопилот в эмуляторе, ~42 с): забег на стену, wall run по билборду, прыжок через 6 м с забегом на стену, wall run → wall jump → wall run, цепочка vault → mantle → mantle.*
+
 ## Запуск
 
 * PICO-8: `load parkour.p8` (или `parkour.p8.png`) → `run`.
