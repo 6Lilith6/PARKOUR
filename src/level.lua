@@ -32,7 +32,7 @@ function setlv(l)
  for i=1,rd(2) do
   local x,z,y=rd(2)/8,rd(2)/8,rd(2)/8
   local w,h,d,m=rd(1)/4,rd(1)/4,rd(1)/4,rd(1)
-  local b={x,y,z,x+w,y+h,z+d,m=m%16,k=m\16,f=mflag[m%16],rad=(w+h+d)/2}
+  local b={x,y,z,x+w,y+h,z+d,m=m%16,k=m\16,f=mflag[m%16]}
   if b.f&8>0 then
    add(trig,b)
    if b.m==11 and b.k==0 then spawn={x+w/2,y,z+d/2,sk[10]/256} end
@@ -42,7 +42,7 @@ function setlv(l)
  end
  -- player pseudo-box, sorted
  -- with the world for drawing
- plb={rad=1}
+ plb={}
  add(dl,plb)
  restart()
 end

@@ -86,7 +86,9 @@ function render()
  -- player pseudo-box joins sort
  plb[1],plb[2],plb[3],plb[4],plb[5],plb[6]=px-r,py,pz-r,px+r,py+ph,pz+r
  -- d: centre distance (tie
- -- break), e: gap distance (fog).
+ -- break), e: gap distance (fog),
+ -- f: depth of the nearest
+ -- corner (all behind: culled).
  -- boxes in range and in front
  -- get camera-space corners and
  -- screen bounds
@@ -97,10 +99,10 @@ function render()
    local c,m=cpos[i],(b[i]+b[i+3])/2
    d+=abs(m-c)
    e+=max(max(b[i]-c,c-b[i+3]))
-   f+=(m-c)*cfw[i]
+   f+=(m-c)*cfw[i]+abs((b[i+3]-b[i])*cfw[i])/2
   end
   b.d,b.e=d,e
-  if e<sk[8]+24 and f>-b.rad then
+  if e<sk[8]+24 and f>near then
    bx,b.cs=split"999,999,-999,-999",{}
    b.bx=bx
    for i=0,7 do
@@ -112,7 +114,7 @@ function render()
    end
   end
   -- on screen?
-  if e<sk[8]+24 and f>-b.rad and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 then add(v,b) end
+  if e<sk[8]+24 and f>near and bx[3]>=0 and bx[1]<128 and bx[4]>=0 and bx[2]<128 then add(v,b) end
  end
  -- painter's order: topological
  -- sort over screen-overlapping

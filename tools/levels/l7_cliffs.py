@@ -99,7 +99,7 @@ def build():
     box(-3, 20, 91.75, -1.5, 23, 92, CLIMB)           # ladders
     box(-3, 23, 97.75, -1.5, 25.5, 98, CLIMB)
     box(-3, 25.5, 103.75, -1.5, 28, 104, CLIMB)
-    box(2, 20, 90, 4, 21.25, 92, PROP)                # crate
+    box(2, 20, 90, 4, 20.75, 92, PROP)                # crate
     box(6, 22.75, 100, 7.5, 23, 103, WOOD)            # balcony
     box(8, 20, 96, 12, 22.5, 100, PROP)               # goat shed
     for z in (95, 101):

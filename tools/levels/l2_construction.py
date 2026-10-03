@@ -24,7 +24,7 @@ NAME = "construction site"
 PALETTE = {}
 # top, haze, sil a, sil b, ground, sun, fog, fog dist, hint base,
 # heading, silhouette height
-SKY = (12, 6, 13, 6, 4, 7, 6, 30, 14, 192, 6)
+SKY = (12, 6, 13, 6, 4, 7, 6, 26, 14, 192, 6)
 MATS = {
     A: (6, 13, 13, 0x58),     # concrete slabs, grime
     B: (9, 4, 4, 0x24),       # formwork panels
@@ -93,11 +93,10 @@ def build():
     L.cp(-4, 17, 21, 20, 23, 2)
 
     # ---------- the gap (x 20..40) at y 17 ----------
-    box(18, 26, 26.75, 42, 26.5, 27.25, BEAM)        # gantry
     for i in range(5):
         x0 = 21.5 + i * 4
         box(x0, 16.75, 26, x0 + 2.5, 17, 28, WOOD)   # hanging pallets
-        box(x0 + 1.125, 17, 27.75, x0 + 1.375, 26, 28, TRIM)
+        box(x0 + 1.125, 17, 27.75, x0 + 1.375, 30, 28, TRIM)  # crane cables
     box(20, 16.75, 30.5, 40, 17, 31, BEAM)           # girder: balance
     box(22, 17.5, 25.75, 37, 21, 26, SIGN)           # panel: wallrun
     L.hint(14, 17, 23, 20, 36, 4)

@@ -69,7 +69,7 @@ def build():
     L.hint(6, 2, 5, 13, 11, 1)
     # west: parked car -> low awning -> shop roofs
     box(3, 2, 3, 5, 3.5, 7, ACCENT)
-    box(0, 4, 8, 2.5, 4.25, 12, BOUNCE)
+    box(0, 4.25, 8, 2.5, 4.5, 12, BOUNCE)
     P(-5, 4, 6.5, 2, 1.5, 1.25)                       # AC units
     P(-9, 11, 6.5, 1.5, 2, 1.25)
     box(-3, 6.5, 16, -1, 8.25, 18, PROP)              # step to W2
@@ -150,9 +150,9 @@ def build():
     box(9, 15, 116, 11.5, 17.5, 118, PROP)
     # 19 -> 23
     box(7, 19, 123.75, 8.5, 23, 124, CLIMB)
-    box(8.5, 20.75, 121.5, 11.5, 21, 124, WOOD)       # gondola
+    box(8.5, 21, 121.5, 11.5, 21.25, 124, WOOD)       # gondola
     for x in (8.5, 11.25):
-        box(x, 21, 123.75, x + .25, 26, 124, TRIM)
+        box(x, 21.25, 123.75, x + .25, 26, 124, TRIM)
     L.goal(6, 23, 125, 14, 133)
 
     # ---------- skyline ----------

@@ -23,7 +23,7 @@ def starts(lv):
         "(function() local t={} for b in all(trig) do if b.m==11 then add(t,{(b[1]+b[4])/2,b[2],(b[3]+b[6])/2}) end end return t end)()").values()]
 
 
-def fuzz(seconds=20, runs=9, levels=range(8), seed=1):
+def fuzz(seconds=20, runs=9, levels=range(8), seed=int(os.environ.get("SEED", 1))):
     rnd = random.Random(seed)
     problems = 0
     for lv in levels:
@@ -62,8 +62,11 @@ def fuzz_level(lv, sp, seconds, runs, rnd, seed):
                 print("L%d run %d frame %d: stuck in %s %s" % (lv + 1, k, f, g.st, pc.state()))
                 problems += 1
                 break
-            if g.st in ("ground", "air", "slide", "roll") and pc.L.eval("phit()"):
-                b = pc.L.eval("phit()")
+            # embedded deeper than 1cm (touching faces can overlap by a
+            # float rounding error here; PICO-8 uses 16.16 fixed point)
+            deep = "hit(px-r+.01,py+.01,pz-r+.01,px+r-.01,py+ph-.01,pz+r-.01)"
+            if g.st in ("ground", "air", "slide", "roll") and pc.L.eval(deep):
+                b = pc.L.eval(deep)
                 print("L%d run %d frame %d: inside box %s %s" % (lv + 1, k, f, [b[i] for i in range(1, 7)], pc.state()))
                 problems += 1
                 break
